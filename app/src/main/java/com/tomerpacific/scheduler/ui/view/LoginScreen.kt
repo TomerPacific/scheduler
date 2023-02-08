@@ -20,11 +20,33 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun LoginScreen() {
+    var tabIndex by remember { mutableStateOf(0) }
+
+    val tabs = listOf("Login", "Sign up")
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TabRow(selectedTabIndex = tabIndex) {
+            tabs.forEachIndexed { index, title ->
+                Tab(text = { Text(title) },
+                    selected = tabIndex == index,
+                    onClick = { tabIndex = index }
+                )
+            }
+        }
+        when (tabIndex) {
+            0 -> LoginLayout()
+            1 -> SignupScreen()
+        }
+    }
+
+}
+
+@Composable
+fun LoginLayout() {
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
-
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -60,9 +82,21 @@ fun LoginScreen() {
                     passwordVisible = !passwordVisible }) {
                     Icon(imageVector = iconImage, contentDescription = "passwordIcon", tint = Color.Blue)
                 }
-               },
+            },
         )
+    }
+}
 
-
+@Composable
+fun SignupScreen() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Text(
+                text = "Please Sign up",
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
