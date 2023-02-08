@@ -35,7 +35,7 @@ fun LoginScreen() {
         }
         when (tabIndex) {
             0 -> LoginLayout()
-            1 -> SignupScreen()
+            1 -> SignupLayout()
         }
     }
 
@@ -48,14 +48,16 @@ fun LoginLayout() {
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center) {
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text(text = "Please Login",
+            Text(text = "Login",
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold)
         }
-        Spacer(modifier = Modifier.padding(horizontal = 0.dp, vertical = 50.dp))
+        Spacer(modifier = Modifier.padding(horizontal = 0.dp, vertical = 10.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = username,
@@ -88,11 +90,13 @@ fun LoginLayout() {
 }
 
 @Composable
-fun SignupScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
+fun SignupLayout() {
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(
-                text = "Please Sign up",
+                text = "Signup",
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
