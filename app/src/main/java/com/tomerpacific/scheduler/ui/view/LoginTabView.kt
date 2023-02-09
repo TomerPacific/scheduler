@@ -4,9 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun LoginTabView() {
+fun LoginTabView(viewModel: MainViewModel) {
     var tabIndex by remember { mutableStateOf(0) }
 
     val tabs = listOf("Login", "Sign up")
@@ -21,8 +22,8 @@ fun LoginTabView() {
             }
         }
         when (tabIndex) {
-            0 -> LoginScreen()
-            1 -> SignupScreen()
+            0 -> LoginScreen(viewModel)
+            1 -> SignupScreen(viewModel)
         }
     }
 

@@ -23,10 +23,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: MainViewModel) {
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
