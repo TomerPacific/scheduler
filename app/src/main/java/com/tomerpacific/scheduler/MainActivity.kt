@@ -8,7 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
-import com.tomerpacific.scheduler.ui.view.LoginScreen
+import com.tomerpacific.scheduler.ui.view.LoginTabView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LoginScreen()
+                    LoginTabView()
                 }
             }
         }
