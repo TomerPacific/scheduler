@@ -1,4 +1,4 @@
-package com.tomerpacific.scheduler.ui
+package com.tomerpacific.scheduler.ui.model
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
