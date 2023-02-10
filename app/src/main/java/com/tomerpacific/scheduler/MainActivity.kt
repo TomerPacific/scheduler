@@ -4,13 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
 import com.tomerpacific.scheduler.ui.view.LoginTabView
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 
 class MainActivity : ComponentActivity() {
 
@@ -22,9 +27,16 @@ class MainActivity : ComponentActivity() {
             SchedulerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = Color(27,69,113)
                 ) {
-                    LoginTabView(viewModel)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_transparent),
+                            contentDescription = "Logo",
+                            contentScale = ContentScale.Inside,
+                            modifier = Modifier.matchParentSize())
+                        LoginTabView(viewModel)
+                    }
                 }
             }
         }
