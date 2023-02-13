@@ -6,16 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
-import com.tomerpacific.scheduler.ui.view.LoginTabView
 import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import com.tomerpacific.scheduler.ui.view.LoginScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -35,7 +34,7 @@ class MainActivity : ComponentActivity() {
                             contentDescription = "Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize())
-                        LoginTabView(viewModel)
+                        LoginScreen(viewModel)
                     }
                 }
             }
