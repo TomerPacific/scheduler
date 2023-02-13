@@ -26,11 +26,11 @@ class MainActivity : ComponentActivity() {
             SchedulerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(27,69,113)
+                    color = Color.White
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Image(
-                            painter = painterResource(id = R.drawable.logo_transparent),
+                            painter = painterResource(id = R.drawable.logo_black),
                             contentDescription = "Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize())
