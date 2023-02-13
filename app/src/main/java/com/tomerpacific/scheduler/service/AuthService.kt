@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 class AuthService {
 
-    private var auth: FirebaseAuth = Firebase.auth
+    private val auth: FirebaseAuth = Firebase.auth
 
     fun isUserCurrentlySignedIn(): Boolean {
         return auth.currentUser != null
