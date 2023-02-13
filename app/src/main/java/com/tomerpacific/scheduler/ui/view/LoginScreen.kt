@@ -33,15 +33,21 @@ fun LoginScreen(viewModel: MainViewModel) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text(text = "Login",
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold)
+        verticalArrangement = Arrangement.Top) {
+        Row {
+            Text("Welcome", fontWeight = FontWeight.Bold, fontSize = 25.sp)
         }
-        Spacer(modifier = Modifier.padding(horizontal = 0.dp, vertical = 10.dp))
+        Row(modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center) {
+            Text(text = "To",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = username,
