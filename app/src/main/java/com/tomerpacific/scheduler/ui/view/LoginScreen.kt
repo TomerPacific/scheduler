@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -44,7 +45,9 @@ fun LoginScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
-                modifier = Modifier.width(300.dp).padding(top = 300.dp),
+                modifier = Modifier
+                    .width(300.dp)
+                    .padding(top = 370.dp),
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("Enter your username") },
@@ -90,6 +93,13 @@ fun LoginScreen(viewModel: MainViewModel) {
                     }
                 },
             )
+            Spacer(modifier = Modifier.size(70.dp))
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = { }) {
+                    Text("Sign up", fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }
