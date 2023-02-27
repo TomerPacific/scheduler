@@ -12,9 +12,15 @@ import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.tomerpacific.scheduler.ui.view.LoginScreen
+import com.tomerpacific.scheduler.ui.view.SignupScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -34,9 +40,29 @@ class MainActivity : ComponentActivity() {
                             contentDescription = "Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize())
-                        LoginScreen(viewModel)
+                        NavGraph()
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun NavGraph(
+        navController: NavHostController = rememberNavController(),
+        startDestination: String = "login"
+    ) {
+
+        NavHost(
+            navController = navController,
+            startDestination = startDestination) {
+            composable("login") {
+                LoginScreen(viewModel = viewModel, onNavigateToSignupScreen = {
+                    navController.navigate("signup")
+                })
+            }
+            composable("signup") {
+                SignupScreen(viewModel = viewModel)
             }
         }
     }
