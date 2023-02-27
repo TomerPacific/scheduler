@@ -20,7 +20,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tomerpacific.scheduler.ui.view.LoginScreen
-import com.tomerpacific.scheduler.ui.view.SignupScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -57,12 +56,9 @@ class MainActivity : ComponentActivity() {
             navController = navController,
             startDestination = startDestination) {
             composable("login") {
-                LoginScreen(viewModel = viewModel, onNavigateToSignupScreen = {
+                LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
                     navController.navigate("signup")
                 })
-            }
-            composable("signup") {
-                SignupScreen(viewModel = viewModel)
             }
         }
     }
