@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun LoginScreen(viewModel: MainViewModel) {
+fun LoginScreen(viewModel: MainViewModel, onNavigateToSignupScreen: () -> Unit) {
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
@@ -96,7 +96,9 @@ fun LoginScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.size(70.dp))
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = { }) {
+                TextButton(onClick = {
+                    onNavigateToSignupScreen()
+                }) {
                     Text("Sign up", fontWeight = FontWeight.Bold)
                 }
             }
