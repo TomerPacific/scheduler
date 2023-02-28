@@ -6,16 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
-import com.tomerpacific.scheduler.ui.view.LoginTabView
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.tomerpacific.scheduler.ui.view.LoginScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -27,17 +31,34 @@ class MainActivity : ComponentActivity() {
             SchedulerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(27,69,113)
+                    color = Color.White
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Image(
-                            painter = painterResource(id = R.drawable.logo_transparent),
+                            painter = painterResource(id = R.drawable.logo_black),
                             contentDescription = "Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize())
-                        LoginTabView(viewModel)
+                        NavGraph()
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun NavGraph(
+        navController: NavHostController = rememberNavController(),
+        startDestination: String = "login"
+    ) {
+
+        NavHost(
+            navController = navController,
+            startDestination = startDestination) {
+            composable("login") {
+                LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
+                    navController.navigate("signup")
+                })
             }
         }
     }
