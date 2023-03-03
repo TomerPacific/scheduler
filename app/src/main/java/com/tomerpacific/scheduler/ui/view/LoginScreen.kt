@@ -24,7 +24,7 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 @Composable
 fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit) {
 
-    var username by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -48,8 +48,8 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
                 modifier = Modifier
                     .width(300.dp)
                     .padding(top = 370.dp),
-                value = username,
-                onValueChange = { username = it },
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("Enter your username") },
                 leadingIcon = {
                     Icon(
@@ -96,12 +96,18 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly) {
                 TextButton(onClick = {
-                    onNavigateAfterLoginScreen()
+                    if (viewModel.isUserInputValid(email.text, password.text)) {
+                       viewModel.loginUser(email.text, password.text)
+                        onNavigateAfterLoginScreen()
+                    }
                 }) {
                     Text("Login", fontWeight = FontWeight.Bold)
                 }
                 TextButton(onClick = {
-                    onNavigateAfterLoginScreen()
+                    if (viewModel.isUserInputValid(email.text, password.text)) {
+                        viewModel.signupUser(email.text, password.text)
+                        onNavigateAfterLoginScreen()
+                    }
                 }) {
                     Text("Sign up", fontWeight = FontWeight.Bold)
                 }
