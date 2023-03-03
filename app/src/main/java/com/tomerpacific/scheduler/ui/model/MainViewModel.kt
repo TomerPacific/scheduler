@@ -44,4 +44,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return authService.isUserCurrentlySignedIn()
     }
 
+    fun logout() {
+        authService.logOutUser()
+    }
+
 }
