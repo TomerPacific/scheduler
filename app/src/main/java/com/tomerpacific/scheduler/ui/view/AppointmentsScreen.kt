@@ -1,11 +1,9 @@
 package com.tomerpacific.scheduler.ui.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.tomerpacific.scheduler.ui.model.MainViewModel
@@ -17,6 +15,12 @@ fun AppointmentsScreen(viewModel: MainViewModel) {
 
     Column(modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End) {
+            TextButton(onClick = {viewModel.logout()}) {
+                Text("Logout")
+            }
+        }
         Row(modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center) {
             if (!isUserConnected) {
