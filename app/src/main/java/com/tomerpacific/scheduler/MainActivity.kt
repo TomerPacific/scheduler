@@ -62,7 +62,9 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("appointments") {
-                AppointmentsScreen(viewModel)
+                AppointmentsScreen(viewModel, onUserLogout = {
+                    navController.navigate("login")
+                })
             }
         }
     }

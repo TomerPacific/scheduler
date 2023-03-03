@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AppointmentsScreen(viewModel: MainViewModel) {
+fun AppointmentsScreen(viewModel: MainViewModel, onUserLogout: () -> Unit) {
 
     val isUserConnected by remember { mutableStateOf(viewModel.isUserConnected()) }
 
@@ -17,7 +17,10 @@ fun AppointmentsScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center) {
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = {viewModel.logout()}) {
+            TextButton(onClick = {
+                viewModel.logout()
+                onUserLogout()
+            }) {
                 Text("Logout")
             }
         }
