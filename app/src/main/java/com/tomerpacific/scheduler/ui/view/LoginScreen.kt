@@ -5,10 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +47,11 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
                     .padding(top = 370.dp),
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Enter your username") },
+                label = { Text("Enter your email") },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "userIcon",
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "emailIcon",
                         tint = Color.Blue
                     )
                 },
@@ -71,7 +68,7 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = "userIcon",
+                        contentDescription = "lockIcon",
                         tint = Color.Blue
                     )
                 },
