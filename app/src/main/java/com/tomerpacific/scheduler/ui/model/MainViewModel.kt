@@ -2,6 +2,8 @@ package com.tomerpacific.scheduler.ui.model
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.tomerpacific.scheduler.service.AuthService
@@ -12,7 +14,8 @@ import kotlinx.coroutines.launch
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var authService: AuthService = AuthService()
-    private var user: FirebaseUser? = null
+    private val _user: MutableLiveData<FirebaseUser?> = MutableLiveData()
+    val user: LiveData<FirebaseUser?> = _user
 
     fun isUserInputValid(email: String, password: String): Boolean {
         return email.isNotEmpty() && password.isNotEmpty()
@@ -22,7 +25,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             coroutineScope {
                 launch {
-                    user = authService.signupUser(email, password)
+                    _user.value = authService.signupUser(email, password)
                 }
             }
 
@@ -33,7 +36,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             coroutineScope {
                 launch {
-                    user = authService.logInUser(email, password)
+                    _user.value = authService.logInUser(email, password)
                 }
             }
 
