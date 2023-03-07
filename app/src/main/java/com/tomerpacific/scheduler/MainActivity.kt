@@ -28,6 +28,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val startDestination: String = viewModel.getStartDestination()
+
         setContent {
             SchedulerTheme {
                 Surface(
@@ -40,7 +43,7 @@ class MainActivity : ComponentActivity() {
                             contentDescription = "Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize())
-                        NavGraph()
+                        NavGraph(startDestination = startDestination)
                     }
                 }
             }

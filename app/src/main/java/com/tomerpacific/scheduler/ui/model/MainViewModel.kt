@@ -43,12 +43,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun isUserConnected(): Boolean {
+    private fun isUserConnected(): Boolean {
         return authService.isUserCurrentlySignedIn()
     }
 
     fun logout() {
         authService.logOutUser()
+    }
+
+    fun getStartDestination(): String {
+        return when (isUserConnected()) {
+            true -> "appointments"
+            false -> "login"
+        }
     }
 
 }
