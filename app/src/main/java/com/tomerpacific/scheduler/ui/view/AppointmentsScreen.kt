@@ -20,6 +20,7 @@ fun AppointmentsScreen(viewModel: MainViewModel, onUserLogout: () -> Unit) {
                     onUserLogout()
                 })
             }
+            AppointmentsList(viewModel)
             Row(modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.Center) {
                 CircularProgressBarIndicator(shouldBeDisplayed = user == null)
