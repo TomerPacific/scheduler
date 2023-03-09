@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.tomerpacific.scheduler.service.AuthService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -56,6 +56,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             true -> "appointments"
             false -> "login"
         }
+    }
+
+    fun getAppointmentsForUser(): List<AppointmentModel> {
+        return listOf()
+    }
+
+    fun convertTimestampToDate(timestamp: Long): Date {
+        return Date(timestamp)
     }
 
 }
