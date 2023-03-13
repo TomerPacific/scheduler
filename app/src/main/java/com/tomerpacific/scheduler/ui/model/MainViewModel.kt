@@ -7,15 +7,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.tomerpacific.scheduler.service.AuthService
+import com.tomerpacific.scheduler.service.DatabaseService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var authService: AuthService = AuthService()
-    private val _user: MutableLiveData<FirebaseUser?> = MutableLiveData()
+    private val authService: AuthService = AuthService()
+    private val databaseService: DatabaseService = DatabaseService()
+    private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
+
+    private val _appointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
+    val appointments: LiveData<List<AppointmentModel>> = _appointments
+
+    init {
+        _user.value = authService.getCurrentlySignedInUser()
+    }
 
     fun isUserInputValid(email: String, password: String): Boolean {
         return email.isNotEmpty() && password.isNotEmpty()
@@ -57,13 +65,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             false -> "login"
         }
     }
-
-    fun getAppointmentsForUser(): List<AppointmentModel> {
-        return listOf()
-    }
-
-    fun convertTimestampToDate(timestamp: Long): Date {
-        return Date(timestamp)
-    }
-
 }
