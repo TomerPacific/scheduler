@@ -8,19 +8,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.tomerpacific.scheduler.Utils
+import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-
 
 @Composable
 fun AppointmentsList(viewModel: MainViewModel) {
 
-    val appointments = viewModel.getAppointmentsForUser()
+    val appointments: List<AppointmentModel> = when(viewModel.appointments.value) {
+        null -> listOf()
+        else -> viewModel.appointments.value!!
+    }
 
     if (appointments.isNotEmpty()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(appointments) { appointment ->
                 Row() {
-                    Text(text = viewModel.convertTimestampToDate(appointment.appointmentDate).toString())
+                    Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString())
                 }
             }
         }
