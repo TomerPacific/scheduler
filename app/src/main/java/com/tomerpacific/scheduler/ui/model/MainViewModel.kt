@@ -21,6 +21,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _appointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
     val appointments: LiveData<List<AppointmentModel>> = _appointments
 
+    private val _adminAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
+    val adminAppointments: LiveData<List<AppointmentModel>> = _adminAppointments
+
     init {
         _user.value = authService.getCurrentlySignedInUser()
     }
