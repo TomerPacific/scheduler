@@ -12,10 +12,13 @@ import androidx.compose.ui.Modifier
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AppointmentsScreen(viewModel: MainViewModel, onUserLogout: () -> Unit) {
+fun AppointmentsScreen(viewModel: MainViewModel,
+                       onUserLogout: () -> Unit,
+                       onAddAppointmentClicked: () -> Unit) {
     val user = viewModel.user.observeAsState()
+
     Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = {}) {
+        FloatingActionButton(onClick = { onAddAppointmentClicked() }) {
             Icon(Icons.Default.Add, contentDescription = "Add Appointment")
         }
     }) { contentPadding ->
@@ -24,7 +27,7 @@ fun AppointmentsScreen(viewModel: MainViewModel, onUserLogout: () -> Unit) {
                 verticalArrangement = Arrangement.Center) {
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End) {
-                    LogoutButton(shouldBeDisplayed = user != null, onClickHandler = {
+                    LogoutButton(shouldBeDisplayed = user.value != null, onClickHandler = {
                         viewModel.logout()
                         onUserLogout()
                     })
@@ -32,7 +35,7 @@ fun AppointmentsScreen(viewModel: MainViewModel, onUserLogout: () -> Unit) {
                 AppointmentsList(viewModel)
                 Row(modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.Center) {
-                    CircularProgressBarIndicator(shouldBeDisplayed = user == null)
+                    CircularProgressBarIndicator(shouldBeDisplayed = user.value == null)
                 }
             }
         }
