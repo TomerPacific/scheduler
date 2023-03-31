@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "603462080509",
+    "firebase_url": "https://scheduler-9f3a0-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "scheduler-9f3a0",
     "storage_bucket": "scheduler-9f3a0.appspot.com"
   },
