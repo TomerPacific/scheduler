@@ -14,4 +14,6 @@ data class AppointmentModel(
             return UUID.randomUUID().toString()
         }
     }
+
+    constructor() : this(0, "", "")
 }
