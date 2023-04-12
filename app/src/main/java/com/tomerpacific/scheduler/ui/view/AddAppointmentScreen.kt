@@ -5,8 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PunchClock
+import androidx.compose.material.icons.filled.TimeToLeave
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -16,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
@@ -64,14 +70,23 @@ fun AddAppointmentScreen(viewModel: MainViewModel) {
             }
         } else {
             items(availableAppointments) { appointment ->
-                Card(modifier = Modifier.fillMaxWidth()
+                Card(modifier = Modifier
+                    .fillMaxWidth()
                     .height(50.dp)
                     .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
                     shape = MaterialTheme.shapes.small,
                     backgroundColor = Color.Transparent,
+                    elevation = 10.dp,
                     border = BorderStroke(width = 3.dp, color = Color.Black)) {
-                    Text(text = appointment.appointmentDate.toString(),
-                        fontSize = 20.sp)
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Icon(modifier = Modifier.padding(start = 5.dp),
+                            imageVector = Icons.Default.Watch,
+                            contentDescription = "Clock Icon")
+                        Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
+                            fontSize = 20.sp)
+                    }
                 }
             }
         }
