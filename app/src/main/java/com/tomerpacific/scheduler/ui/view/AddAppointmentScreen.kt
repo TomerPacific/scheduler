@@ -4,13 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PunchClock
 import androidx.compose.material.icons.filled.TimeToLeave
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -31,36 +29,22 @@ fun AddAppointmentScreen(viewModel: MainViewModel) {
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Text("Add An Appointment",
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp)) {
+                Text("Schedule An Appointment",
                     fontWeight = FontWeight.Bold,
                     fontSize = 25.sp,
                     textAlign = TextAlign.Center)
             }
         }
 
-//        item {
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                TextButton(onClick = {
-//                    val date = Date()
-//                    date.hours = 11
-//                    date.minutes = 0
-//                    date.seconds = 0
-//                    val appointment = AppointmentModel(
-//                        date.time,
-//                        "somewhere",
-//                        "one hour"
-//                    )
-//                    viewModel.addAppointment(appointment)
-//                }) {
-//                    Text("Add Appointment")
-//                }
-//            }
-//        }
-
         if (availableAppointments == null) {
             item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center) {
                     Text(
                         text = "There are no available appointments. Please try again later.",
                         fontSize = 15.sp,
@@ -75,17 +59,19 @@ fun AddAppointmentScreen(viewModel: MainViewModel) {
                     .height(50.dp)
                     .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
                     shape = MaterialTheme.shapes.small,
-                    backgroundColor = Color.Transparent,
                     elevation = 10.dp,
                     border = BorderStroke(width = 3.dp, color = Color.Black)) {
                     Row(modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween) {
                         Icon(modifier = Modifier.padding(start = 5.dp),
-                            imageVector = Icons.Default.Watch,
+                            imageVector = Icons.Default.Timelapse,
                             contentDescription = "Clock Icon")
                         Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
-                            fontSize = 20.sp)
+                            fontSize = 15.sp)
+                        TextButton(onClick = {}) {
+                            Text("Schedule", fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
