@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
+import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
 import com.tomerpacific.scheduler.ui.view.LoginScreen
 
@@ -73,7 +74,12 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("add-appointment") {
-                AddAppointmentScreen(viewModel = viewModel)
+                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = {
+                    navController.navigate("appointment-set")
+                })
+            }
+            composable("appointment-set") {
+                AppointmentSetScreen(viewModel = viewModel)
             }
         }
     }
