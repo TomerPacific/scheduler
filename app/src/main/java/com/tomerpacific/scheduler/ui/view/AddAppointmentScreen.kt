@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PunchClock
@@ -23,7 +24,7 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AddAppointmentScreen(viewModel: MainViewModel) {
+fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: () -> Unit) {
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
 
@@ -69,7 +70,11 @@ fun AddAppointmentScreen(viewModel: MainViewModel) {
                             contentDescription = "Clock Icon")
                         Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
                             fontSize = 15.sp)
-                        TextButton(onClick = {}) {
+                        TextButton(onClick = {
+                            viewModel.addAppointment(appointment)
+                            onAppointmentScheduled()
+                         },
+                            shape = RoundedCornerShape(50)) {
                             Text("Schedule", fontWeight = FontWeight.Bold)
                         }
                     }
