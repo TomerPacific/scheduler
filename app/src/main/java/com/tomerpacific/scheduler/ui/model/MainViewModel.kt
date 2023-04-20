@@ -21,11 +21,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _appointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
     val appointments: LiveData<List<AppointmentModel>> = _appointments
 
-    private val _adminAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
-    val adminAppointments: LiveData<List<AppointmentModel>> = _adminAppointments
+    private val _availableAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
+    val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
 
     init {
         _user.value = authService.getCurrentlySignedInUser()
+        databaseService.getAvailableAppointmentsForToday(this)
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -68,4 +69,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             false -> "login"
         }
     }
+
+    fun addAppointment(appointment: AppointmentModel) {
+        databaseService.setAppointment(_user.value!!, appointment, this)
+    }
+
+    fun setAvailableAppointments(appointments: List<AppointmentModel>) {
+        _availableAppointments.value = appointments
+    }
+
 }
