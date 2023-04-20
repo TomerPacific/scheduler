@@ -15,4 +15,12 @@ object Utils {
         return floored.toLong()
     }
 
+    fun createStartDateForAppointmentsOfDay(): Date {
+        return Date().apply {
+            hours = 10
+            minutes = 0
+            seconds = 0
+        }
+    }
+
 }
