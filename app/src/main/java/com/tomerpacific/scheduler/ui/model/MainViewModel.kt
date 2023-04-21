@@ -70,8 +70,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addAppointment(appointment: AppointmentModel) {
-        databaseService.setAppointment(_user.value!!, appointment, this)
+    fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?) -> Unit) {
+        databaseService.setAppointment(_user.value!!, appointment, onAppointmentScheduled)
     }
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
