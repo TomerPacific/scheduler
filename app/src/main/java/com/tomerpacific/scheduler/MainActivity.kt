@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
@@ -74,12 +76,14 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("add-appointment") {
-                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = {
-                    navController.navigate("appointment-set")
+                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { error ->
+                    navController.navigate("appointment-set/${error}")
                 })
             }
-            composable("appointment-set") {
-                AppointmentSetScreen(viewModel = viewModel)
+            composable(
+                "appointment-set/{errorMsg}",
+                arguments = listOf(navArgument("errorMsg") { type = NavType.StringType })) { backStackEntry ->
+                AppointmentSetScreen(viewModel = viewModel, backStackEntry.arguments?.getString("errorMsg"))
             }
         }
     }
