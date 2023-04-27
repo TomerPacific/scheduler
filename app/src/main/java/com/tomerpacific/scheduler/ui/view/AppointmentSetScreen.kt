@@ -5,11 +5,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.WrongLocation
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.ui.model.MainViewModel
@@ -22,29 +23,33 @@ fun AppointmentSetScreen(viewModel: MainViewModel, errorMsg: String?) {
         else -> false
     }
 
+    val titleText:String = if (wasAppointmentSetSuccessfully) "Appointment Set!" else "Appointment Not Set!"
+    val iconImageVector: ImageVector = if (wasAppointmentSetSuccessfully) Icons.Default.Check else Icons.Default.Error
+    val iconContentDescription: String = if (wasAppointmentSetSuccessfully) "Check Mark" else "Error"
+
     Column(modifier = Modifier.fillMaxSize().padding(top = 20.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
-            Text("Appointment Set!", fontSize = 25.sp)
+            Text(titleText, fontSize = 25.sp)
         }
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
-            if (wasAppointmentSetSuccessfully) {
-                Icon(imageVector = Icons.Default.Check,
+                Icon(imageVector = iconImageVector,
                     modifier = Modifier.size(50.dp),
-                    contentDescription = "Check Mark",
+                    contentDescription = iconContentDescription,
                     tint = Color.Green)
-            } else {
-                Icon(imageVector = Icons.Default.WrongLocation,
-                    modifier = Modifier.size(50.dp),
-                    contentDescription = "Check Mark",
-                    tint = Color.Red)
-            }
-
         }
+        if (!errorMsg.isNullOrEmpty() && errorMsg != "null") {
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                Text(errorMsg, fontSize = 25.sp)
+            }
+        }
+
     }
 }
