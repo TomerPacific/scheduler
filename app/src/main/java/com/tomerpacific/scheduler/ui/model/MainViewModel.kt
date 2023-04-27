@@ -26,7 +26,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         _user.value = authService.getCurrentlySignedInUser()
+        if (_user.value != null) {
+            databaseService.getAppointmentsForUser(_user.value!!, this)
+        }
         databaseService.getAvailableAppointmentsForToday(this)
+
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -76,6 +80,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
         _availableAppointments.value = appointments
+    }
+
+    fun setScheduledAppointments(scheduledAppointments: List<AppointmentModel>) {
+        _appointments.value = scheduledAppointments
     }
 
 }
