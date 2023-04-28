@@ -27,7 +27,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.getAppointmentsForUser(_user.value!!, this)
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
         }
         databaseService.getAvailableAppointmentsForToday(this)
 
@@ -84,6 +84,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setScheduledAppointments(scheduledAppointments: List<AppointmentModel>) {
         _appointments.value = scheduledAppointments
+    }
+
+    fun updateScheduledAppointmentsForUser() {
+        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
     }
 
 }
