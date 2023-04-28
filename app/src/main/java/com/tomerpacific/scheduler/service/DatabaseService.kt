@@ -82,7 +82,7 @@ class DatabaseService() {
         return appointments
     }
 
-    fun getAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
+    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
         val appointments = mutableListOf<AppointmentModel>()
         database.child(DATABASE_USERS_KEY).child(user.uid).get()
             .addOnCompleteListener { query ->
