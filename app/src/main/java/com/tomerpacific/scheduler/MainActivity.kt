@@ -77,13 +77,17 @@ class MainActivity : ComponentActivity() {
             }
             composable("add-appointment") {
                 AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { error ->
+                    viewModel.updateScheduledAppointmentsForUser()
                     navController.navigate("appointment-set/${error}")
                 })
             }
             composable(
                 "appointment-set/{errorMsg}",
                 arguments = listOf(navArgument("errorMsg") { type = NavType.StringType })) { backStackEntry ->
-                AppointmentSetScreen(viewModel = viewModel, backStackEntry.arguments?.getString("errorMsg"))
+                AppointmentSetScreen(viewModel = viewModel,
+                    backStackEntry.arguments?.getString("errorMsg"), onBackToAppointmentScreenPressed = {
+                        navController.navigate("appointments")
+                    })
             }
         }
     }
