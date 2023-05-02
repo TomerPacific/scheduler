@@ -70,8 +70,8 @@ class DatabaseService() {
                 "one hour")
 
             val appointmentExists = scheduledAppointments.filter { scheduledAppointment ->
-                val appDate = scheduledAppointment.appointmentDate
-                appointment.appointmentDate == appDate
+                val scheduledAppointmentDate = scheduledAppointment.appointmentDate
+                appointment.appointmentDate == scheduledAppointmentDate
             }
 
             if (appointmentExists.isEmpty()) {
