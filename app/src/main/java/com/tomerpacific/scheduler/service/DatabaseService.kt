@@ -38,9 +38,11 @@ class DatabaseService() {
                 if (dataSnapshot.exists()) {
                     val scheduledAppointments = mutableListOf<AppointmentModel>()
                     val children = dataSnapshot.child(DATABASE_USERS_KEY).children
-                    children.forEach {
-                        it.getValue<AppointmentModel>()?.let { appointment ->
-                            scheduledAppointments.add(appointment)
+                    children.forEach { userAppointments ->
+                        userAppointments.children.forEach {
+                            it.getValue<AppointmentModel>()?.let { appointment ->
+                                scheduledAppointments.add(appointment)
+                            }
                         }
                     }
                     val availableAppointments = createAppointmentsForDay(scheduledAppointments.toList())
