@@ -32,6 +32,33 @@ class DatabaseService() {
             }
     }
 
+    fun cancelAppointment(user: FirebaseUser,
+                          appointment: AppointmentModel,
+                          onAppointmentCancelled: (String?) -> Unit) {
+        database.child(DATABASE_USERS_KEY).child(user.uid).get()
+            .addOnCompleteListener { datasnapshot ->
+                if (datasnapshot.isSuccessful) {
+                    val children = datasnapshot.result.children
+                        children.forEach { userAppointment ->
+                            userAppointment.getValue<AppointmentModel>()?.let { scheduledAppointment ->
+                                if (scheduledAppointment.appointmentId == appointment.appointmentId) {
+                                    userAppointment.ref.removeValue()
+                                        .addOnCompleteListener {
+                                            onAppointmentCancelled(null)
+                                        }
+                                        .addOnFailureListener { error ->
+                                            onAppointmentCancelled(error.message)
+                                        }
+                                }
+                            }
+                        }
+                 }
+            }
+            .addOnFailureListener { error ->
+                onAppointmentCancelled(error.message)
+            }
+    }
+
     fun getAvailableAppointmentsForToday(viewModel: MainViewModel) {
         database.orderByChild(DATABASE_APPOINTMENT_DATE_KEY).addValueEventListener(object: ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
