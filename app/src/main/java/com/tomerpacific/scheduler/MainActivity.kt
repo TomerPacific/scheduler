@@ -74,6 +74,7 @@ class MainActivity : ComponentActivity() {
                 }, onAddAppointmentClicked = {
                     navController.navigate("add-appointment")
                 }, onAppointmentCancelled = { error ->
+                    viewModel.updateScheduledAppointmentsForUser()
                     navController.navigate("appointment-set/${error}")
                 })
             }
