@@ -14,7 +14,8 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 @Composable
 fun AppointmentsScreen(viewModel: MainViewModel,
                        onUserLogout: () -> Unit,
-                       onAddAppointmentClicked: () -> Unit) {
+                       onAddAppointmentClicked: () -> Unit,
+                       onAppointmentCancelled: (String?) -> Unit) {
     val user = viewModel.user.observeAsState()
 
     Scaffold(floatingActionButton = {
@@ -32,7 +33,7 @@ fun AppointmentsScreen(viewModel: MainViewModel,
                         onUserLogout()
                     })
                 }
-                AppointmentsList(viewModel)
+                AppointmentsList(viewModel, onAppointmentCancelled)
                 Row(modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.Center) {
                     CircularProgressBarIndicator(shouldBeDisplayed = user.value == null)
