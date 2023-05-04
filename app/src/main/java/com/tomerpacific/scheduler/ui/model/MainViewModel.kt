@@ -90,4 +90,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
     }
 
+    fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
+                                          onAppointmentCancelled: (String?) -> Unit) {
+        databaseService.cancelAppointment(_user.value!!, appointment, onAppointmentCancelled)
+    }
+
 }
