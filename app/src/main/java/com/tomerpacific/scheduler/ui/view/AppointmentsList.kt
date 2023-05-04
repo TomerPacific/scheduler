@@ -21,7 +21,8 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AppointmentsList(viewModel: MainViewModel) {
+fun AppointmentsList(viewModel: MainViewModel,
+                     onAppointmentCancelled: (String?) -> Unit) {
 
     val appointments = viewModel.appointments.observeAsState()
 
@@ -52,7 +53,7 @@ fun AppointmentsList(viewModel: MainViewModel) {
                         Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
                             fontSize = 15.sp)
                         TextButton(onClick = {
-
+                            viewModel.cancelScheduledAppointmentForUser(appointment, onAppointmentCancelled)
                         },
                             shape = RoundedCornerShape(50)
                         ) {
