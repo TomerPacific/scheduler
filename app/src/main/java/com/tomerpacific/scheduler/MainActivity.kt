@@ -73,6 +73,8 @@ class MainActivity : ComponentActivity() {
                     navController.navigate("login")
                 }, onAddAppointmentClicked = {
                     navController.navigate("add-appointment")
+                }, onAppointmentCancelled = { error ->
+                    navController.navigate("appointment-set/${error}")
                 })
             }
             composable("add-appointment") {
