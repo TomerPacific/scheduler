@@ -22,7 +22,7 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
 fun AppointmentsList(viewModel: MainViewModel,
-                     onAppointmentCancelled: (String?) -> Unit) {
+                     onAppointmentCancelled: (String?, String?) -> Unit) {
 
     val appointments = viewModel.appointments.observeAsState()
 
