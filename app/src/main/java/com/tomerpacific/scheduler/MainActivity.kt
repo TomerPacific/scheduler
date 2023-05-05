@@ -73,22 +73,29 @@ class MainActivity : ComponentActivity() {
                     navController.navigate("login")
                 }, onAddAppointmentClicked = {
                     navController.navigate("add-appointment")
-                }, onAppointmentCancelled = { error ->
+                }, onAppointmentCancelled = { appointmentAction, error ->
                     viewModel.updateScheduledAppointmentsForUser()
-                    navController.navigate("appointment-set/${error}")
+                    navController.navigate("appointment-set/${appointmentAction}/${error}")
                 })
             }
             composable("add-appointment") {
-                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { error ->
+                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { appointmentAction, error ->
                     viewModel.updateScheduledAppointmentsForUser()
-                    navController.navigate("appointment-set/${error}")
+                    navController.navigate("appointment-set/${appointmentAction}/${error}")
                 })
             }
             composable(
-                "appointment-set/{errorMsg}",
-                arguments = listOf(navArgument("errorMsg") { type = NavType.StringType })) { backStackEntry ->
-                AppointmentSetScreen(viewModel = viewModel,
-                    backStackEntry.arguments?.getString("errorMsg"), onBackToAppointmentScreenPressed = {
+                "appointment-set/{appointmentAction}/{errorMsg}",
+                arguments = listOf(
+                    navArgument("appointmentAction") { type = NavType.StringType },
+                    navArgument("errorMsg") { type = NavType.StringType }
+                )) { backStackEntry ->
+                val appointmentAction = backStackEntry.arguments?.getString("appointmentAction")
+                val errorMsg = backStackEntry.arguments?.getString("errorMsg")
+                AppointmentSetScreen(
+                    appointmentAction,
+                    errorMsg,
+                    onBackToAppointmentScreenPressed = {
                         navController.navigate("appointments")
                     })
             }
