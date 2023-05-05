@@ -19,22 +19,22 @@ class DatabaseService() {
 
     fun setAppointment(user:FirebaseUser,
                        appointment: AppointmentModel,
-                       onAppointmentScheduled: (String?) -> Unit) {
+                       onAppointmentScheduled: (String?, String?) -> Unit) {
         database.child(DATABASE_USERS_KEY).child(user.uid).push()
             .setValue(appointment)
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
-                    onAppointmentScheduled(null)
+                    onAppointmentScheduled("schedule", null)
                 }
             }
             .addOnFailureListener { error ->
-                onAppointmentScheduled(error.message)
+                onAppointmentScheduled("schedule", error.message)
             }
     }
 
     fun cancelAppointment(user: FirebaseUser,
                           appointment: AppointmentModel,
-                          onAppointmentCancelled: (String?) -> Unit) {
+                          onAppointmentCancelled: (String?, String?) -> Unit) {
         database.child(DATABASE_USERS_KEY).child(user.uid).get()
             .addOnCompleteListener { datasnapshot ->
                 if (datasnapshot.isSuccessful) {
@@ -44,10 +44,10 @@ class DatabaseService() {
                                 if (scheduledAppointment.appointmentId == appointment.appointmentId) {
                                     userAppointment.ref.removeValue()
                                         .addOnCompleteListener {
-                                            onAppointmentCancelled(null)
+                                            onAppointmentCancelled("cancel", null)
                                         }
                                         .addOnFailureListener { error ->
-                                            onAppointmentCancelled(error.message)
+                                            onAppointmentCancelled("cancel", error.message)
                                         }
                                 }
                             }
@@ -55,7 +55,7 @@ class DatabaseService() {
                  }
             }
             .addOnFailureListener { error ->
-                onAppointmentCancelled(error.message)
+                onAppointmentCancelled("cancel", error.message)
             }
     }
 
