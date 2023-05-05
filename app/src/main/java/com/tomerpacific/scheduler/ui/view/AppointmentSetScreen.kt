@@ -14,21 +14,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AppointmentSetScreen(viewModel: MainViewModel,
+fun AppointmentSetScreen(appointmentAction: String?,
                          errorMsg: String?,
                          onBackToAppointmentScreenPressed: () -> Unit) {
 
-    val wasAppointmentSetSuccessfully: Boolean = when(errorMsg) {
+    val wasAppointmentActionCompletedSuccessfully: Boolean = when(errorMsg) {
         "null" -> true
         else -> false
     }
 
-    val titleText:String = if (wasAppointmentSetSuccessfully) "Appointment Set!" else "Appointment Not Set!"
-    val iconImageVector: ImageVector = if (wasAppointmentSetSuccessfully) Icons.Default.Check else Icons.Default.Error
-    val iconContentDescription: String = if (wasAppointmentSetSuccessfully) "Check Mark" else "Error"
+    val titleText:String = getAppointmentSetScreenTitle(appointmentAction, wasAppointmentActionCompletedSuccessfully)
+    val iconImageVector: ImageVector = if (wasAppointmentActionCompletedSuccessfully) Icons.Default.Check else Icons.Default.Error
+    val iconContentDescription: String = if (wasAppointmentActionCompletedSuccessfully) "Check Mark" else "Error"
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -67,4 +66,17 @@ fun AppointmentSetScreen(viewModel: MainViewModel,
         }
 
     }
+}
+
+private fun getAppointmentSetScreenTitle(appointmentAction: String?,
+                                         wasAppointmentActionCompletedSuccessfully: Boolean): String {
+    appointmentAction?.let { action ->
+        return when(action) {
+            "schedule" -> if (wasAppointmentActionCompletedSuccessfully) "Appointment Set!" else "Appointment Not Set!"
+            "cancel" -> if (wasAppointmentActionCompletedSuccessfully) "Appointment Cancelled!" else "Appointment Not Cancelled!"
+            else -> ""
+        }
+    }
+
+    return ""
 }
