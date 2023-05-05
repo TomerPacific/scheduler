@@ -15,7 +15,7 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 fun AppointmentsScreen(viewModel: MainViewModel,
                        onUserLogout: () -> Unit,
                        onAddAppointmentClicked: () -> Unit,
-                       onAppointmentCancelled: (String?) -> Unit) {
+                       onAppointmentCancelled: (String?, String?) -> Unit) {
     val user = viewModel.user.observeAsState()
 
     Scaffold(floatingActionButton = {

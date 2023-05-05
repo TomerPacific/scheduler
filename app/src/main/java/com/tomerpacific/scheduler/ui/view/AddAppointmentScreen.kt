@@ -21,7 +21,7 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
-fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (String?) -> Unit) {
+fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (String?, String?) -> Unit) {
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
 

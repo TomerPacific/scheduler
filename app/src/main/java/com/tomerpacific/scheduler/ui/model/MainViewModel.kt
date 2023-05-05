@@ -74,7 +74,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?) -> Unit) {
+    fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?, String?) -> Unit) {
         databaseService.setAppointment(_user.value!!, appointment, onAppointmentScheduled)
     }
 
@@ -91,7 +91,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
-                                          onAppointmentCancelled: (String?) -> Unit) {
+                                          onAppointmentCancelled: (String?, String?) -> Unit) {
         databaseService.cancelAppointment(_user.value!!, appointment, onAppointmentCancelled)
     }
 
