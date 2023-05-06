@@ -28,6 +28,9 @@ fun AppointmentsList(viewModel: MainViewModel,
 
     if (appointments.value != null &&
         appointments.value!!.isNotEmpty()) {
+        val sortedAppointmentsByDate = appointments.value!!.sortedBy { appointment ->
+            appointment.appointmentDate
+        }
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 25.dp),
              verticalAlignment = Alignment.CenterVertically) {
             Text("Your Scheduled Appointments",
@@ -35,7 +38,7 @@ fun AppointmentsList(viewModel: MainViewModel,
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(appointments.value!!) { appointment ->
+            items(sortedAppointmentsByDate) { appointment ->
                 Card(modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
