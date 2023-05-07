@@ -32,7 +32,7 @@ fun AppointmentSetScreen(appointmentAction: String?,
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(top = 20.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -54,14 +54,13 @@ fun AppointmentSetScreen(appointmentAction: String?,
                 Text(errorMsg, fontSize = 25.sp)
             }
         }
-        Spacer(modifier = Modifier.height(50.dp))
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth().weight(1f, false),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
             TextButton(onClick = {
                 onBackToAppointmentScreenPressed()
             }) {
-                Text("Back To Appointments")
+                Text("Back To Appointments", fontSize = 20.sp)
             }
         }
 
