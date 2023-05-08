@@ -1,19 +1,23 @@
 package com.tomerpacific.scheduler.ui.view
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.tomerpacific.scheduler.R
 
 @Composable
 fun AppointmentSetScreen(appointmentAction: String?,
@@ -26,8 +30,9 @@ fun AppointmentSetScreen(appointmentAction: String?,
     }
 
     val titleText:String = getAppointmentSetScreenTitle(appointmentAction, wasAppointmentActionCompletedSuccessfully)
-    val iconImageVector: ImageVector = if (wasAppointmentActionCompletedSuccessfully) Icons.Default.Check else Icons.Default.Error
-    val iconContentDescription: String = if (wasAppointmentActionCompletedSuccessfully) "Check Mark" else "Error"
+    
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.check_mark_success))
+    val progress by animateLottieCompositionAsState(composition)
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -37,23 +42,25 @@ fun AppointmentSetScreen(appointmentAction: String?,
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
-            Text(titleText, fontSize = 25.sp)
+            Text(titleText, fontSize = 25.sp, fontWeight = FontWeight.Bold)
         }
-        Row(modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center) {
-                Icon(imageVector = iconImageVector,
-                    modifier = Modifier.size(50.dp),
-                    contentDescription = iconContentDescription,
-                    tint = Color.Green)
-        }
-        if (!errorMsg.isNullOrEmpty() && errorMsg != "null") {
+        if (errorMsg == "null") {
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                )
+            }
+        } else if (!errorMsg.isNullOrEmpty()){
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
                 Text(errorMsg, fontSize = 25.sp)
             }
         }
+
         Row(modifier = Modifier.fillMaxWidth().weight(1f, false),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
