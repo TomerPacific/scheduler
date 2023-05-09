@@ -3,13 +3,9 @@ package com.tomerpacific.scheduler.ui.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,8 +26,8 @@ fun AppointmentSetScreen(appointmentAction: String?,
     }
 
     val titleText:String = getAppointmentSetScreenTitle(appointmentAction, wasAppointmentActionCompletedSuccessfully)
-    
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.check_mark_success))
+    val rawAnimationFile: Int = if (wasAppointmentActionCompletedSuccessfully) R.raw.check_mark_success else R.raw.error
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(rawAnimationFile))
     val progress by animateLottieCompositionAsState(composition)
 
     Column(modifier = Modifier
