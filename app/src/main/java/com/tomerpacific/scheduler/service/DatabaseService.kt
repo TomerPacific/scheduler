@@ -90,7 +90,14 @@ class DatabaseService() {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay()
 
-        for (i in 10..19) {
+        var startHour = 10
+        if (startDate.hours >= 19) {
+            return appointments
+        } else if (startDate.hours > 10 && startDate.hours < 19) {
+            startHour = startDate.hours
+        }
+
+        for (i in startHour..19) {
             val appointment = AppointmentModel(
                 Utils.truncateTimestamp(startDate.time),
                 "",
@@ -113,13 +120,19 @@ class DatabaseService() {
 
     fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
         val appointments = mutableListOf<AppointmentModel>()
+        val pastAppointments = mutableListOf<AppointmentModel>()
+
         database.child(DATABASE_USERS_KEY).child(user.uid).get()
             .addOnCompleteListener { query ->
                 if (query.isSuccessful) {
                     val children = query.result.children
                     children.forEach {
                         it.getValue<AppointmentModel>()?.let { appointment ->
-                            appointments.add(appointment)
+                            if (!Utils.isAppointmentDatePassed(appointment)) {
+                                appointments.add(appointment)
+                            } else {
+                                pastAppointments.add(appointment)
+                            }
                         }
                     }
                     viewModel.setScheduledAppointments(appointments.toList())
@@ -127,7 +140,6 @@ class DatabaseService() {
             }
             .addOnFailureListener { error ->
 
+            }
         }
-    }
-
 }
