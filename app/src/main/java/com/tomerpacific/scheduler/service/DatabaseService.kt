@@ -86,6 +86,23 @@ class DatabaseService() {
         })
     }
 
+    private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
+        database.child(DATABASE_USERS_KEY).child(user.uid).get()
+            .addOnCompleteListener { datasnapshot ->
+                if (datasnapshot.isSuccessful) {
+                    val children = datasnapshot.result.children
+                    children.forEach { userAppointment ->
+                        userAppointment.getValue<AppointmentModel>()?.let { scheduledAppointment ->
+                            if (pastAppointments.contains(scheduledAppointment)) {
+                                userAppointment.ref.removeValue()
+                                pastAppointments.remove(scheduledAppointment)
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
     private fun createAppointmentsForDay(scheduledAppointments: List<AppointmentModel>): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay()
@@ -136,6 +153,9 @@ class DatabaseService() {
                         }
                     }
                     viewModel.setScheduledAppointments(appointments.toList())
+                    if (pastAppointments.isNotEmpty()) {
+                        removePastAppointmentsForUser(user, pastAppointments)
+                    }
                 }
             }
             .addOnFailureListener { error ->
