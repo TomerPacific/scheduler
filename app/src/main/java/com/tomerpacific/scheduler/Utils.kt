@@ -1,5 +1,6 @@
 package com.tomerpacific.scheduler
 
+import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.util.*
 import kotlin.math.floor
 
@@ -17,10 +18,16 @@ object Utils {
 
     fun createStartDateForAppointmentsOfDay(): Date {
         return Date().apply {
-            hours = 10
+            hours = hours + 1
             minutes = 0
             seconds = 0
         }
+    }
+
+    fun isAppointmentDatePassed(appointment: AppointmentModel): Boolean {
+        val appointmentDate = convertTimestampToDate(appointment.appointmentDate)
+        val currentDate = Date()
+        return appointmentDate.before(currentDate)
     }
 
 }

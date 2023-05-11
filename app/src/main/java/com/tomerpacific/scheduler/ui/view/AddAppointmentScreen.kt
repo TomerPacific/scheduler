@@ -39,14 +39,15 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
             }
         }
 
-        if (availableAppointments == null) {
+        if (availableAppointments == null || availableAppointments.isEmpty()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center) {
                     Text(
                         text = "There are no available appointments. Please try again later.",
                         fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
