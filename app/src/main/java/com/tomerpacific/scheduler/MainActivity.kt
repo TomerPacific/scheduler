@@ -57,28 +57,28 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NavGraph(
         navController: NavHostController = rememberNavController(),
-        startDestination: String = "login"
+        startDestination: String = NAVIGATION_DESTINATION_LOGIN
     ) {
 
         NavHost(
             navController = navController,
             startDestination = startDestination) {
-            composable("login") {
+            composable(NAVIGATION_DESTINATION_LOGIN) {
                 LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
-                    navController.navigate("appointments")
+                    navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
                 })
             }
-            composable("appointments") {
+            composable(NAVIGATION_DESTINATION_APPOINTMENTS) {
                 AppointmentsScreen(viewModel, onUserLogout = {
-                    navController.navigate("login")
+                    navController.navigate(NAVIGATION_DESTINATION_LOGIN)
                 }, onAddAppointmentClicked = {
-                    navController.navigate("add-appointment")
+                    navController.navigate(NAVIGATION_DESTINATION_ADD_APPOINTMENT)
                 }, onAppointmentCancelled = { appointmentAction, error ->
                     viewModel.updateScheduledAppointmentsForUser()
                     navController.navigate("appointment-set/${appointmentAction}/${error}")
                 })
             }
-            composable("add-appointment") {
+            composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
                 AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { appointmentAction, error ->
                     viewModel.updateScheduledAppointmentsForUser()
                     navController.navigate("appointment-set/${appointmentAction}/${error}")
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     appointmentAction,
                     errorMsg,
                     onBackToAppointmentScreenPressed = {
-                        navController.navigate("appointments")
+                        navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
                     })
             }
         }
