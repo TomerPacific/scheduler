@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import kotlinx.coroutines.coroutineScope
@@ -69,8 +71,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getStartDestination(): String {
         return when (isUserConnected()) {
-            true -> "appointments"
-            false -> "login"
+            true -> NAVIGATION_DESTINATION_APPOINTMENTS
+            false -> NAVIGATION_DESTINATION_LOGIN
         }
     }
 
