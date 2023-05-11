@@ -7,6 +7,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import com.tomerpacific.scheduler.APPOINTMENT_ACTION_CANCEL
+import com.tomerpacific.scheduler.APPOINTMENT_ACTION_SCHEDULE
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
@@ -24,11 +26,11 @@ class DatabaseService() {
             .setValue(appointment)
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
-                    onAppointmentScheduled("schedule", null)
+                    onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
                 }
             }
             .addOnFailureListener { error ->
-                onAppointmentScheduled("schedule", error.message)
+                onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, error.message)
             }
     }
 
@@ -44,10 +46,10 @@ class DatabaseService() {
                                 if (scheduledAppointment.appointmentId == appointment.appointmentId) {
                                     userAppointment.ref.removeValue()
                                         .addOnCompleteListener {
-                                            onAppointmentCancelled("cancel", null)
+                                            onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
                                         }
                                         .addOnFailureListener { error ->
-                                            onAppointmentCancelled("cancel", error.message)
+                                            onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, error.message)
                                         }
                                 }
                             }
@@ -55,7 +57,7 @@ class DatabaseService() {
                  }
             }
             .addOnFailureListener { error ->
-                onAppointmentCancelled("cancel", error.message)
+                onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, error.message)
             }
     }
 
