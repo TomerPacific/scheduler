@@ -6,6 +6,7 @@ data class AppointmentModel(
     val appointmentDate: Long,
     val appointmentPlace: String,
     val appointmentDuration: String,
+    var userId: String?,
     val appointmentId: String = generateId()
 ) {
     companion object {
@@ -15,5 +16,5 @@ data class AppointmentModel(
         }
     }
 
-    constructor() : this(0, "", "")
+    constructor() : this(0, "", "", "")
 }
