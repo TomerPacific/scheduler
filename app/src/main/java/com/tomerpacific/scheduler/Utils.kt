@@ -1,6 +1,8 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import java.security.Timestamp
+import java.time.ZoneId
 import java.util.*
 import kotlin.math.floor
 
@@ -8,6 +10,12 @@ object Utils {
 
     fun convertTimestampToDate(timestamp: Long): Date {
         return Date(timestamp)
+    }
+
+    fun convertTimestampToDayAndMonth(timestamp: Long): String {
+        val date = convertTimestampToDate(timestamp)
+        val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        return "${localDate.dayOfMonth}-${localDate.month}"
     }
 
     fun truncateTimestamp(timestamp: Long): Long {
@@ -28,6 +36,11 @@ object Utils {
         val appointmentDate = convertTimestampToDate(appointment.appointmentDate)
         val currentDate = Date()
         return appointmentDate.before(currentDate)
+    }
+
+    fun isAppointmentDateInDay(appointmentDate: Long, day: Int): Boolean {
+        val appointmentDate = convertTimestampToDate(appointmentDate)
+        return appointmentDate.day == day
     }
 
 }
