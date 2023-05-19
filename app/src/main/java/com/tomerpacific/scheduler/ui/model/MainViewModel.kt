@@ -12,6 +12,7 @@ import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -31,7 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (_user.value != null) {
             databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
         }
-        databaseService.getAvailableAppointmentsForToday(this)
+        databaseService.getAvailableAppointmentsForDate(this, Date())
 
     }
 
@@ -77,7 +78,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?, String?) -> Unit) {
-        databaseService.setAppointment(_user.value!!, appointment, onAppointmentScheduled)
+        appointment.userId = _user.value!!.uid
+        databaseService.setAppointment(appointment, onAppointmentScheduled)
     }
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
