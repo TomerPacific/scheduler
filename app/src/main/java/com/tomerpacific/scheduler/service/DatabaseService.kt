@@ -4,11 +4,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import com.tomerpacific.scheduler.APPOINTMENT_ACTION_CANCEL
 import com.tomerpacific.scheduler.APPOINTMENT_ACTION_SCHEDULE
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-import java.util.*
 import kotlin.collections.HashMap
 
 class DatabaseService() {
@@ -23,24 +23,17 @@ class DatabaseService() {
             .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
-                    var data = result.result.getValue<HashMap<String, List<String>>>()
+                    var data = result.result.getValue<HashMap<String, String>>()
 
                     if (data == null) {
                         data =  hashMapOf()
                     }
 
-                    if (data.containsKey(appointment.userId!!)) {
-                        val appointments = data.get(appointment.userId!!)?.toMutableList()
-                        appointments?.add(appointment.appointmentId)
-                        data.put(appointment.userId!!, appointments!!)
-                    } else {
-                        data[appointment.userId!!] = listOf(appointment.appointmentId)
-                    }
+                    data[appointment.appointmentDate.toString()] = appointment.userId!!
 
                     database.child(DATES_KEY)
                         .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate))
                         .setValue(data)
-                    onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
                 }
             }
             .addOnFailureListener { error ->
@@ -50,13 +43,21 @@ class DatabaseService() {
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
 
-                    val appointments = when(val data: HashMap<String, AppointmentModel>? = result.result.getValue<HashMap<String, AppointmentModel>>()) {
+                    val appointments = when(val data: HashMap<String, List<AppointmentModel>>? = result.result.getValue<HashMap<String, List<AppointmentModel>>>()) {
                         null -> HashMap()
                         else -> data
                     }
 
-                    appointments[appointment.appointmentId] = appointment
+                    val scheduledAppointments = appointments[appointment.userId!!]
+                    val aps = when (scheduledAppointments.isNullOrEmpty()) {
+                        true -> mutableListOf<AppointmentModel>()
+                        false -> scheduledAppointments.toMutableList()
+                    }
+
+                    aps.add(appointment)
+                    appointments[appointment.userId!!] = aps
                     database.child(APPOINTMENTS_KEY).setValue(appointments).addOnCompleteListener {
+                        onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
                     }
                 }
             }
@@ -65,13 +66,12 @@ class DatabaseService() {
             }
     }
 
-    fun cancelAppointment(user: FirebaseUser,
-                          appointment: AppointmentModel,
+    fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
-
+       
     }
 
-    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Date) {
+    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
 
     }
 
