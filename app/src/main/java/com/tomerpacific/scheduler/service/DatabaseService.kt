@@ -68,11 +68,12 @@ class DatabaseService() {
 
     fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
-       
+
     }
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
-
+        val availableAppointments = createAppointmentsForDay(listOf())
+        viewModel.setAvailableAppointments(availableAppointments)
     }
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
@@ -113,6 +114,15 @@ class DatabaseService() {
     }
 
     fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
-
+        database.child(APPOINTMENTS_KEY).get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val scheduledAppointments = result.result.getValue<HashMap<String, List<AppointmentModel>>>()
+                    if (scheduledAppointments != null) {
+                        val userAppointments = scheduledAppointments[user.uid]
+                        viewModel.setScheduledAppointments(scheduledAppointments = userAppointments!!)
+                    }
+                }
+            }
     }
 }
