@@ -43,18 +43,18 @@ class DatabaseService() {
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
 
-                    val appointments = when(val data: HashMap<String, List<AppointmentModel>>? = result.result.getValue<HashMap<String, List<AppointmentModel>>>()) {
+                    val appointments = when(val data: HashMap<String, HashMap<String, AppointmentModel>>? = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()) {
                         null -> HashMap()
                         else -> data
                     }
 
                     val scheduledAppointments = appointments[appointment.userId!!]
                     val aps = when (scheduledAppointments.isNullOrEmpty()) {
-                        true -> mutableListOf<AppointmentModel>()
-                        false -> scheduledAppointments.toMutableList()
+                        true -> hashMapOf<String, AppointmentModel>()
+                        false -> scheduledAppointments
                     }
 
-                    aps.add(appointment)
+                    aps[appointment.appointmentId] = appointment
                     appointments[appointment.userId!!] = aps
                     database.child(APPOINTMENTS_KEY).setValue(appointments).addOnCompleteListener {
                         onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
@@ -68,7 +68,38 @@ class DatabaseService() {
 
     fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
+        database.child(DATES_KEY)
+            .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val scheduledAppointments = result.result.getValue<HashMap<String, String>>()
+                    if (scheduledAppointments != null) {
+                        for (appointmentTime in scheduledAppointments.keys) {
+                            if (appointmentTime.toLong() == appointment.appointmentDate) {
+                                scheduledAppointments.remove(appointmentTime)
+                            }
+                        }
+                        database.child(DATES_KEY)
+                            .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
+                            .addOnCompleteListener {
 
+                            }.addOnFailureListener {
+
+                            }
+                    }
+                }
+            }
+
+        database.child(APPOINTMENTS_KEY).equalTo(appointment.userId).get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val userScheduledAppointments = result.result.getValue<HashMap<String, List<AppointmentModel>>>()
+                    //Need list to contain keys of appointment ids/dates and then the appointment itself
+//                    if (userScheduledAppointments != null && userScheduledAppointments.containsKey()) {
+//
+//                    }
+                }
+            }
     }
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
@@ -132,10 +163,16 @@ class DatabaseService() {
         database.child(APPOINTMENTS_KEY).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, List<AppointmentModel>>>()
+                    val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
                     if (scheduledAppointments != null) {
                         val userAppointments = scheduledAppointments[user.uid]
-                        viewModel.setScheduledAppointments(scheduledAppointments = userAppointments!!)
+                        val appointments = mutableListOf<AppointmentModel>()
+                        if (userAppointments != null) {
+                            for (useAppointment in userAppointments.keys) {
+                                appointments.add(userAppointments[useAppointment]!!)
+                            }
+                            viewModel.setScheduledAppointments(scheduledAppointments = appointments)
+                        }
                     }
                 }
             }
