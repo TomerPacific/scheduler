@@ -72,15 +72,31 @@ class DatabaseService() {
     }
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
-        val availableAppointments = createAppointmentsForDay(listOf())
-        viewModel.setAvailableAppointments(availableAppointments)
+        database.child(DATES_KEY)
+            .child(Utils.convertTimestampToDayAndMonth(date)).get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val scheduledAppointments = mutableListOf<Long>()
+                    val appointmentDates = result.result.getValue<HashMap<String, String>>()
+                    if (appointmentDates != null) {
+
+                        for (appointmentTime in appointmentDates.keys) {
+                            scheduledAppointments.add(appointmentTime.toLong())
+                        }
+                    }
+
+                    val availableAppointments = createAppointmentsForDay(scheduledAppointments)
+                    viewModel.setAvailableAppointments(availableAppointments)
+                }
+            }
+
     }
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
 
     }
 
-    private fun createAppointmentsForDay(scheduledAppointments: List<AppointmentModel>): MutableList<AppointmentModel> {
+    private fun createAppointmentsForDay(scheduledAppointments: List<Long>): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay()
 
@@ -99,8 +115,7 @@ class DatabaseService() {
             null)
 
             val appointmentExists = scheduledAppointments.filter { scheduledAppointment ->
-                val scheduledAppointmentDate = scheduledAppointment.appointmentDate
-                appointment.appointmentDate == scheduledAppointmentDate
+                appointment.appointmentDate == scheduledAppointment
             }
 
             if (appointmentExists.isEmpty()) {
