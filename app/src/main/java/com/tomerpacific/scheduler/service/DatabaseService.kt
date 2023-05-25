@@ -89,15 +89,19 @@ class DatabaseService() {
                     }
                 }
             }
-
-        database.child(APPOINTMENTS_KEY).equalTo(appointment.userId).get()
+        database.child(APPOINTMENTS_KEY).child(appointment.userId!!).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
-                    val userScheduledAppointments = result.result.getValue<HashMap<String, List<AppointmentModel>>>()
-                    //Need list to contain keys of appointment ids/dates and then the appointment itself
-//                    if (userScheduledAppointments != null && userScheduledAppointments.containsKey()) {
-//
-//                    }
+                    val userScheduledAppointments = result.result.getValue<HashMap<String, AppointmentModel>>()
+                    if (userScheduledAppointments != null && userScheduledAppointments.containsKey(appointment.appointmentId)) {
+                        userScheduledAppointments.remove(appointment.appointmentId)
+                        database.child(APPOINTMENTS_KEY)
+                            .child(appointment.userId!!)
+                            .setValue(userScheduledAppointments)
+                            .addOnCompleteListener {
+                                onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
+                            }
+                    }
                 }
             }
     }
