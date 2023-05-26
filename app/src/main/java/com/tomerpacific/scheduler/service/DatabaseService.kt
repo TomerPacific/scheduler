@@ -73,19 +73,16 @@ class DatabaseService() {
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
                     val scheduledAppointments = result.result.getValue<HashMap<String, String>>()
-                    if (scheduledAppointments != null) {
-                        for (appointmentTime in scheduledAppointments.keys) {
-                            if (appointmentTime.toLong() == appointment.appointmentDate) {
-                                scheduledAppointments.remove(appointmentTime)
-                            }
-                        }
-                        database.child(DATES_KEY)
-                            .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
-                            .addOnCompleteListener {
+                    if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentDate.toString())) {
+                            scheduledAppointments.remove(appointment.appointmentDate.toString())
+                    }
 
-                            }.addOnFailureListener {
+                    database.child(DATES_KEY)
+                        .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
+                        .addOnCompleteListener {
 
-                            }
+                        }.addOnFailureListener {
+
                     }
                 }
             }
