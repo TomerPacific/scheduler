@@ -177,6 +177,8 @@ class DatabaseService() {
                             }
                             viewModel.setScheduledAppointments(scheduledAppointments = appointments)
                         }
+                    } else {
+                        viewModel.setScheduledAppointments(scheduledAppointments = listOf())
                     }
                 }
             }
