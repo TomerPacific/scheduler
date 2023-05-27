@@ -9,6 +9,7 @@ import com.tomerpacific.scheduler.APPOINTMENT_ACTION_SCHEDULE
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import java.util.*
 import kotlin.collections.HashMap
 
 class DatabaseService {
@@ -124,6 +125,24 @@ class DatabaseService {
     }
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
+
+        database.child(DATES_KEY)
+            .endAt(Date().time.toString())
+            .get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, String>>>()
+                    if (scheduledAppointments != null) {
+                        for (date in scheduledAppointments.keys) {
+                            scheduledAppointments[date]?.clear()
+                        }
+                        database.child(DATES_KEY).setValue(scheduledAppointments)
+                    }
+
+                }
+            }.addOnFailureListener {
+
+            }
         database.child(APPOINTMENTS_KEY).child(user.uid).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
