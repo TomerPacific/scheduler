@@ -138,7 +138,6 @@ class DatabaseService {
                         }
                         database.child(DATES_KEY).setValue(scheduledAppointments)
                     }
-
                 }
             }.addOnFailureListener {
 
@@ -158,6 +157,9 @@ class DatabaseService {
                         .child(user.uid)
                         .setValue(scheduledAppointments)
                         .addOnCompleteListener {
+
+                        }
+                        .addOnFailureListener {
 
                         }
                 }
