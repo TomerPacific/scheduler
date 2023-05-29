@@ -32,7 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (_user.value != null) {
             databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
         }
-        databaseService.getAvailableAppointmentsForDate(this, Date())
+        databaseService.getAvailableAppointmentsForDate(this, Date().time)
 
     }
 
@@ -96,7 +96,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
                                           onAppointmentCancelled: (String?, String?) -> Unit) {
-        databaseService.cancelAppointment(_user.value!!, appointment, onAppointmentCancelled)
+        databaseService.cancelAppointment(appointment, onAppointmentCancelled)
     }
 
 }
