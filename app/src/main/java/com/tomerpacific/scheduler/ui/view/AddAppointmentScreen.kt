@@ -89,13 +89,15 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     LocalDateTime.now()),
                 onClick = {
                     currentDate = LocalDateTime.from(currentDate).minusDays(1)
+                    viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
                 Text("<- Previous Day", fontWeight = FontWeight.Bold)
             }
 
             TextButton(onClick = {
-                currentDate = LocalDateTime.from(currentDate).plusDays(1)
+                    currentDate = LocalDateTime.from(currentDate).plusDays(1)
+                    viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
                 Text("Next Day ->", fontWeight = FontWeight.Bold)
