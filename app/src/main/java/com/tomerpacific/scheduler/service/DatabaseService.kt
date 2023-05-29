@@ -117,7 +117,7 @@ class DatabaseService {
                         }
                     }
 
-                    val availableAppointments = createAppointmentsForDay(scheduledAppointments)
+                    val availableAppointments = createAppointmentsForDay(scheduledAppointments, date)
                     viewModel.setAvailableAppointments(availableAppointments)
                 }
             }
@@ -166,9 +166,9 @@ class DatabaseService {
             }
     }
 
-    private fun createAppointmentsForDay(scheduledAppointments: List<Long>): MutableList<AppointmentModel> {
+    private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
-        val startDate = Utils.createStartDateForAppointmentsOfDay()
+        val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
 
         var startHour = 10
         if (startDate.hours >= 19) {
