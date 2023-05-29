@@ -1,7 +1,6 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
-import java.security.Timestamp
 import java.time.ZoneId
 import java.util.*
 import kotlin.math.floor
@@ -36,11 +35,6 @@ object Utils {
         val appointmentDate = convertTimestampToDate(appointment.appointmentDate)
         val currentDate = Date()
         return appointmentDate.before(currentDate)
-    }
-
-    fun isAppointmentDateInDay(appointmentDate: Long, day: Int): Boolean {
-        val appointmentDate = convertTimestampToDate(appointmentDate)
-        return appointmentDate.day == day
     }
 
 }
