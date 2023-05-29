@@ -1,6 +1,7 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 import kotlin.math.floor
@@ -35,6 +36,10 @@ object Utils {
         val appointmentDate = convertTimestampToDate(appointment.appointmentDate)
         val currentDate = Date()
         return appointmentDate.before(currentDate)
+    }
+
+    fun getDayAndMonthFromLocalDateTime(date: LocalDateTime): String {
+        return date.month.toString() + date.dayOfMonth
     }
 
 }
