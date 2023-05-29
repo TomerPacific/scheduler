@@ -1,6 +1,7 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -24,8 +25,15 @@ object Utils {
         return floored.toLong()
     }
 
-    fun createStartDateForAppointmentsOfDay(): Date {
-        return Date().apply {
+    fun createStartDateForAppointmentsOfDay(dateToStart: Long?): Date {
+        var startAppointmentDate: Date = Date()
+
+        if (dateToStart != null) {
+           val convertedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dateToStart), TimeZone.getDefault().toZoneId())
+            startAppointmentDate = Date.from(convertedDate.atZone(ZoneId.systemDefault()).toInstant())
+        }
+
+        return startAppointmentDate.apply {
             hours = hours + 1
             minutes = 0
             seconds = 0
