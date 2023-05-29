@@ -19,9 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import java.time.LocalDateTime
 
 @Composable
 fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (String?, String?) -> Unit) {
+
+    var currentDate: LocalDateTime by remember { mutableStateOf(LocalDateTime.now()) }
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
     Column(modifier = Modifier.fillMaxSize()) {
@@ -81,16 +84,19 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
         }
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween) {
-            TextButton(onClick = {
-
-            },
+            TextButton(
+                enabled = Utils.getDayAndMonthFromLocalDateTime(currentDate) != Utils.getDayAndMonthFromLocalDateTime(
+                    LocalDateTime.now()),
+                onClick = {
+                    currentDate = LocalDateTime.from(currentDate).minusDays(1)
+                },
                 shape = RoundedCornerShape(50)) {
                 Text("<- Previous Day", fontWeight = FontWeight.Bold)
             }
 
             TextButton(onClick = {
-
-            },
+                currentDate = LocalDateTime.from(currentDate).plusDays(1)
+                },
                 shape = RoundedCornerShape(50)) {
                 Text("Next Day ->", fontWeight = FontWeight.Bold)
             }
