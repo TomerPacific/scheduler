@@ -24,60 +24,77 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (String?, String?) -> Unit) {
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
-
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)) {
-                Text("Schedule An Appointment",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp,
-                    textAlign = TextAlign.Center)
-            }
-        }
-
-        if (availableAppointments == null || availableAppointments.isEmpty()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
-                    Text(
-                        text = "There are no available appointments. Please try again later.",
-                        fontSize = 15.sp,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)) {
+                    Text("Schedule An Appointment",
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
+                        fontSize = 25.sp,
+                        textAlign = TextAlign.Center)
                 }
             }
-        } else {
-            items(availableAppointments) { appointment ->
-                Card(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
-                    shape = MaterialTheme.shapes.small,
-                    elevation = 10.dp,
-                    border = BorderStroke(width = 3.dp, color = Color.Black)) {
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween) {
-                        Icon(modifier = Modifier.padding(start = 5.dp),
-                            imageVector = Icons.Default.Timelapse,
-                            contentDescription = "Clock Icon")
-                        Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
-                            fontSize = 15.sp)
-                        TextButton(onClick = {
-                            viewModel.addAppointment(appointment, onAppointmentScheduled)
-                         },
-                            shape = RoundedCornerShape(50)) {
-                            Text("Schedule", fontWeight = FontWeight.Bold)
+
+            if (availableAppointments == null || availableAppointments.isEmpty()) {
+                item {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center) {
+                        Text(
+                            text = "There are no available appointments. Please try again later.",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                items(availableAppointments) { appointment ->
+                    Card(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+                        shape = MaterialTheme.shapes.small,
+                        elevation = 10.dp,
+                        border = BorderStroke(width = 3.dp, color = Color.Black)) {
+                        Row(modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                            Icon(modifier = Modifier.padding(start = 5.dp),
+                                imageVector = Icons.Default.Timelapse,
+                                contentDescription = "Clock Icon")
+                            Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
+                                fontSize = 15.sp)
+                            TextButton(onClick = {
+                                viewModel.addAppointment(appointment, onAppointmentScheduled)
+                            },
+                                shape = RoundedCornerShape(50)) {
+                                Text("Schedule", fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             }
         }
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(onClick = {
 
+            },
+                shape = RoundedCornerShape(50)) {
+                Text("<- Previous Day", fontWeight = FontWeight.Bold)
+            }
+
+            TextButton(onClick = {
+
+            },
+                shape = RoundedCornerShape(50)) {
+                Text("Next Day ->", fontWeight = FontWeight.Bold)
+            }
+        }
     }
+
 }
