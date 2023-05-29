@@ -12,6 +12,8 @@ import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -97,6 +99,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
                                           onAppointmentCancelled: (String?, String?) -> Unit) {
         databaseService.cancelAppointment(appointment, onAppointmentCancelled)
+    }
+
+    fun getAppointmentsForDay(date: LocalDateTime) {
+        databaseService.getAvailableAppointmentsForDate(this, date.toInstant(ZoneOffset.UTC).toEpochMilli())
     }
 
 }
