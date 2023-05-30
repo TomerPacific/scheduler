@@ -25,6 +25,9 @@ import java.time.LocalDateTime
 fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (String?, String?) -> Unit) {
 
     var currentDate: LocalDateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    var shouldPreviousDayButtonBeEnabled: Boolean by remember {
+        mutableStateOf(calculatePreviousDayButtonEnabledState(currentDate))
+    }
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
     Column(modifier = Modifier.fillMaxSize()) {
@@ -85,10 +88,10 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween) {
             TextButton(
-                enabled = Utils.getDayAndMonthFromLocalDateTime(currentDate) != Utils.getDayAndMonthFromLocalDateTime(
-                    LocalDateTime.now()),
+                enabled = shouldPreviousDayButtonBeEnabled,
                 onClick = {
                     currentDate = LocalDateTime.from(currentDate).minusDays(1)
+                    shouldPreviousDayButtonBeEnabled = calculatePreviousDayButtonEnabledState(currentDate)
                     viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
@@ -97,6 +100,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
 
             TextButton(onClick = {
                     currentDate = LocalDateTime.from(currentDate).plusDays(1)
+                    shouldPreviousDayButtonBeEnabled = calculatePreviousDayButtonEnabledState(currentDate)
                     viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
@@ -104,5 +108,9 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
             }
         }
     }
+}
 
+private fun calculatePreviousDayButtonEnabledState(currentDate: LocalDateTime): Boolean {
+    return Utils.getDayAndMonthFromLocalDateTime(currentDate) !=
+            Utils.getDayAndMonthFromLocalDateTime(LocalDateTime.now())
 }
