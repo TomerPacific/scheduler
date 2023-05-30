@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -95,7 +97,11 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
-                Text("<- Previous Day", fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.ArrowLeft, contentDescription = "Left Arrow")
+                    Text("Previous Day", fontWeight = FontWeight.Bold)
+                }
+
             }
 
             TextButton(onClick = {
@@ -104,7 +110,10 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     viewModel.getAppointmentsForDay(currentDate)
                 },
                 shape = RoundedCornerShape(50)) {
-                Text("Next Day ->", fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Next Day", fontWeight = FontWeight.Bold)
+                    Icon(imageVector = Icons.Default.ArrowRight, contentDescription = "Right Arrow")
+                }
             }
         }
     }
