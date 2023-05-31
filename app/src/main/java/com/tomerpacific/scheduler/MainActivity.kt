@@ -21,10 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
-import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
-import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
-import com.tomerpacific.scheduler.ui.view.LoginScreen
+import com.tomerpacific.scheduler.ui.view.*
 
 class MainActivity : ComponentActivity() {
 
@@ -57,12 +54,17 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NavGraph(
         navController: NavHostController = rememberNavController(),
-        startDestination: String = NAVIGATION_DESTINATION_LOGIN
+        startDestination: String = NAVIGATION_DESTINATION_SPLASH
     ) {
 
         NavHost(
             navController = navController,
             startDestination = startDestination) {
+            composable(NAVIGATION_DESTINATION_SPLASH) {
+                SplashScreen(splashTimerEnd = {
+                    navController.navigate(startDestination)
+                })
+            }
             composable(NAVIGATION_DESTINATION_LOGIN) {
                 LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
                     navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
