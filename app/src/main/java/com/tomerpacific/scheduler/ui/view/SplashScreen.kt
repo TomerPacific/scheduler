@@ -2,30 +2,34 @@ package com.tomerpacific.scheduler.ui.view
 
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.tomerpacific.scheduler.R
 
 @Composable
 fun SplashScreen(splashTimerEnd:() -> Unit) {
 
-    val backgroundImage = if (isSystemInDarkTheme()) R.drawable.logo_transparent else R.drawable.logo_black
+    val rawAnimationFile: Int = R.raw.schedule_animation
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(rawAnimationFile))
+    val progress by animateLottieCompositionAsState(composition)
 
     DisposableEffect(Unit) {
         val handler = Handler(Looper.getMainLooper())
         val runnable = {
             splashTimerEnd()
         }
-        handler.postDelayed(runnable, 5000)
+        handler.postDelayed(runnable, 2500)
 
         onDispose {
             handler.removeCallbacks(runnable)
@@ -37,10 +41,14 @@ fun SplashScreen(splashTimerEnd:() -> Unit) {
             .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
             .fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(id = backgroundImage),
-            contentDescription = "Logo",
-            contentScale = ContentScale.Inside,
-            modifier = Modifier.matchParentSize())
+        Row(modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center) {
+            LottieAnimation(
+                composition = composition,
+                progress = { progress },
+            )
+        }
+
     }
 }
