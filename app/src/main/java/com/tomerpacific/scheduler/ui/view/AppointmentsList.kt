@@ -31,7 +31,7 @@ fun AppointmentsList(viewModel: MainViewModel,
         val sortedAppointmentsByDate = appointments.value!!.sortedBy { appointment ->
             appointment.appointmentDate
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 25.dp),
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 25.dp, top = 10.dp),
              verticalAlignment = Alignment.CenterVertically) {
             Text("Your Scheduled Appointments",
                 fontSize = 30.sp,
@@ -69,7 +69,9 @@ fun AppointmentsList(viewModel: MainViewModel,
     } else {
         Row(modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center) {
-            Text(text = "You have no upcoming appointments.")
+            Text(text = "You have no upcoming appointments.",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         }
     }
 
