@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
             navController = navController,
             startDestination = startDestination) {
             composable(NAVIGATION_DESTINATION_SPLASH) {
-                SplashScreen(splashTimerEnd = {
+                SplashScreen(navigationCallbackOnAnimationEnd = {
                     navController.navigate(afterSplashDestination)
                 })
             }
