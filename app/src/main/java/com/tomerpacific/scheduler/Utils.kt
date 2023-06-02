@@ -31,10 +31,18 @@ object Utils {
         if (dateToStart != null) {
            val convertedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dateToStart), TimeZone.getDefault().toZoneId())
             startAppointmentDate = Date.from(convertedDate.atZone(ZoneId.systemDefault()).toInstant())
+            if (startAppointmentDate.day != Date().day) {
+                return startAppointmentDate.apply {
+                    hours = 10
+                    minutes = 0
+                    seconds = 0
+                }
+            }
         }
 
+
         return startAppointmentDate.apply {
-            hours = hours + 1
+            hours += 1
             minutes = 0
             seconds = 0
         }

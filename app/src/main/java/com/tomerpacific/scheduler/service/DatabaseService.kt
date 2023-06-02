@@ -169,12 +169,14 @@ class DatabaseService {
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
-
         var startHour = 10
-        if (startDate.hours >= 19) {
-            return appointments
-        } else if (startDate.hours > 10 && startDate.hours < 19) {
-            startHour = startDate.hours
+
+        if (startDate.day == Date().day) {
+            if (startDate.hours >= 19) {
+                return appointments
+            } else if (startDate.hours > 10 && startDate.hours < 19) {
+                startHour = startDate.hours
+            }
         }
 
         for (i in startHour..19) {
