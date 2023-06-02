@@ -102,11 +102,11 @@ class MainActivity : ComponentActivity() {
             composable(
                 "appointment-set/{appointmentAction}/{errorMsg}",
                 arguments = listOf(
-                    navArgument("appointmentAction") { type = NavType.StringType },
-                    navArgument("errorMsg") { type = NavType.StringType }
+                    navArgument(APPOINTMENT_ACTION_KET) { type = NavType.StringType },
+                    navArgument(ERROR_MESSAGE_KEY) { type = NavType.StringType }
                 )) { backStackEntry ->
-                val appointmentAction = backStackEntry.arguments?.getString("appointmentAction")
-                val errorMsg = backStackEntry.arguments?.getString("errorMsg")
+                val appointmentAction = backStackEntry.arguments?.getString(APPOINTMENT_ACTION_KET)
+                val errorMsg = backStackEntry.arguments?.getString(ERROR_MESSAGE_KEY)
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
