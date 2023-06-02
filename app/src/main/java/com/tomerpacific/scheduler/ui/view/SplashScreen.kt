@@ -22,7 +22,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.tomerpacific.scheduler.R
 
 @Composable
-fun SplashScreen(splashTimerEnd:() -> Unit) {
+fun SplashScreen(navigationCallbackOnAnimationEnd:() -> Unit) {
 
     val rawAnimationFile: Int = R.raw.schedule_animation
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(rawAnimationFile))
@@ -31,9 +31,9 @@ fun SplashScreen(splashTimerEnd:() -> Unit) {
     DisposableEffect(Unit) {
         val handler = Handler(Looper.getMainLooper())
         val runnable = {
-            splashTimerEnd()
+            navigationCallbackOnAnimationEnd()
         }
-        handler.postDelayed(runnable, 2500)
+        handler.postDelayed(runnable, 2000)
 
         onDispose {
             handler.removeCallbacks(runnable)
