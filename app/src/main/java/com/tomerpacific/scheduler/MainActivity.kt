@@ -72,22 +72,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable(NAVIGATION_DESTINATION_APPOINTMENTS) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_black),
-                        contentDescription = "Logo",
-                        contentScale = ContentScale.Inside,
-                        modifier = Modifier.matchParentSize()
-                    )
-                    AppointmentsScreen(viewModel, onUserLogout = {
-                        navController.navigate(NAVIGATION_DESTINATION_LOGIN)
-                    }, onAddAppointmentClicked = {
-                        navController.navigate(NAVIGATION_DESTINATION_ADD_APPOINTMENT)
-                    }, onAppointmentCancelled = { appointmentAction, error ->
-                        viewModel.updateScheduledAppointmentsForUser()
-                        navController.navigate("appointment-set/${appointmentAction}/${error}")
-                    })
-                }
+                AppointmentsScreen(viewModel, onUserLogout = {
+                    navController.navigate(NAVIGATION_DESTINATION_LOGIN)
+                }, onAddAppointmentClicked = {
+                    navController.navigate(NAVIGATION_DESTINATION_ADD_APPOINTMENT)
+                }, onAppointmentCancelled = { appointmentAction, error ->
+                    viewModel.updateScheduledAppointmentsForUser()
+                    navController.navigate("appointment-set/${appointmentAction}/${error}")
+                })
             }
             composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
                 Box(modifier = Modifier.fillMaxSize()) {
