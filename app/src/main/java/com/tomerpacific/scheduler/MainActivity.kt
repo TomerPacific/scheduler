@@ -21,10 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
-import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
-import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
-import com.tomerpacific.scheduler.ui.view.LoginScreen
+import com.tomerpacific.scheduler.ui.view.*
 
 class MainActivity : ComponentActivity() {
 
@@ -33,22 +30,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val startDestination: String = viewModel.getStartDestination()
-
         setContent {
             SchedulerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo_black),
-                            contentDescription = "Logo",
-                            contentScale = ContentScale.Inside,
-                            modifier = Modifier.matchParentSize())
-                        NavGraph(startDestination = startDestination)
-                    }
+                    NavGraph(startDestination = NAVIGATION_DESTINATION_SPLASH)
                 }
             }
         }
@@ -57,32 +45,65 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NavGraph(
         navController: NavHostController = rememberNavController(),
-        startDestination: String = NAVIGATION_DESTINATION_LOGIN
+        startDestination: String = NAVIGATION_DESTINATION_SPLASH
     ) {
+
+        val afterSplashDestination: String = viewModel.getStartDestination()
 
         NavHost(
             navController = navController,
             startDestination = startDestination) {
-            composable(NAVIGATION_DESTINATION_LOGIN) {
-                LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
-                    navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
+            composable(NAVIGATION_DESTINATION_SPLASH) {
+                SplashScreen(navigationCallbackOnAnimationEnd = {
+                    navController.navigate(afterSplashDestination)
                 })
+            }
+            composable(NAVIGATION_DESTINATION_LOGIN) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_black),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    LoginScreen(viewModel = viewModel, onNavigateAfterLoginScreen = {
+                        navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
+                    })
+                }
             }
             composable(NAVIGATION_DESTINATION_APPOINTMENTS) {
-                AppointmentsScreen(viewModel, onUserLogout = {
-                    navController.navigate(NAVIGATION_DESTINATION_LOGIN)
-                }, onAddAppointmentClicked = {
-                    navController.navigate(NAVIGATION_DESTINATION_ADD_APPOINTMENT)
-                }, onAppointmentCancelled = { appointmentAction, error ->
-                    viewModel.updateScheduledAppointmentsForUser()
-                    navController.navigate("appointment-set/${appointmentAction}/${error}")
-                })
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_black),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    AppointmentsScreen(viewModel, onUserLogout = {
+                        navController.navigate(NAVIGATION_DESTINATION_LOGIN)
+                    }, onAddAppointmentClicked = {
+                        navController.navigate(NAVIGATION_DESTINATION_ADD_APPOINTMENT)
+                    }, onAppointmentCancelled = { appointmentAction, error ->
+                        viewModel.updateScheduledAppointmentsForUser()
+                        navController.navigate("appointment-set/${appointmentAction}/${error}")
+                    })
+                }
             }
             composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
-                AddAppointmentScreen(viewModel = viewModel, onAppointmentScheduled = { appointmentAction, error ->
-                    viewModel.updateScheduledAppointmentsForUser()
-                    navController.navigate("appointment-set/${appointmentAction}/${error}")
-                })
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_black),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    AddAppointmentScreen(
+                        viewModel = viewModel,
+                        onAppointmentScheduled = { appointmentAction, error ->
+                            viewModel.updateScheduledAppointmentsForUser()
+                            navController.navigate("appointment-set/${appointmentAction}/${error}")
+                        })
+                }
             }
             composable(
                 "appointment-set/{appointmentAction}/{errorMsg}",
@@ -92,12 +113,21 @@ class MainActivity : ComponentActivity() {
                 )) { backStackEntry ->
                 val appointmentAction = backStackEntry.arguments?.getString("appointmentAction")
                 val errorMsg = backStackEntry.arguments?.getString("errorMsg")
-                AppointmentSetScreen(
-                    appointmentAction,
-                    errorMsg,
-                    onBackToAppointmentScreenPressed = {
-                        navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
-                    })
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_black),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    AppointmentSetScreen(
+                        appointmentAction,
+                        errorMsg,
+                        onBackToAppointmentScreenPressed = {
+                            navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
+                        })
+                }
             }
         }
     }
