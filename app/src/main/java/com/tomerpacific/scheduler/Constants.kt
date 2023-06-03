@@ -16,3 +16,6 @@ const val APPOINTMENT_ACTION_SCHEDULE = "schedule"
 const val APPOINTMENT_ACTION_CANCEL = "cancel"
 const val APPOINTMENT_ACTION_KET = "appointmentAction"
 const val ERROR_MESSAGE_KEY = "errorMsg"
+
+const val START_HOUR_FOR_APPOINTMENTS = 10
+const val END_HOUR_FOR_APPOINTMENTS = 19
