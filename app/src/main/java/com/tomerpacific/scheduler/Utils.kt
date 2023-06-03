@@ -33,7 +33,7 @@ object Utils {
             startAppointmentDate = Date.from(convertedDate.atZone(ZoneId.systemDefault()).toInstant())
             if (startAppointmentDate.day != Date().day) {
                 return startAppointmentDate.apply {
-                    hours = 10
+                    hours = START_HOUR_FOR_APPOINTMENTS
                     minutes = 0
                     seconds = 0
                 }

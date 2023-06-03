@@ -4,9 +4,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import com.tomerpacific.scheduler.APPOINTMENT_ACTION_CANCEL
-import com.tomerpacific.scheduler.APPOINTMENT_ACTION_SCHEDULE
-import com.tomerpacific.scheduler.Utils
+import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import java.util.*
@@ -169,12 +167,13 @@ class DatabaseService {
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
-        var startHour = 10
+        var startHour = START_HOUR_FOR_APPOINTMENTS
 
         if (startDate.day == Date().day) {
-            if (startDate.hours >= 19) {
+            if (startDate.hours >= END_HOUR_FOR_APPOINTMENTS) {
                 return appointments
-            } else if (startDate.hours > 10 && startDate.hours < 19) {
+            } else if (startDate.hours > START_HOUR_FOR_APPOINTMENTS &&
+                startDate.hours < END_HOUR_FOR_APPOINTMENTS) {
                 startHour = startDate.hours
             }
         }
