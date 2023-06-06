@@ -1,7 +1,9 @@
 package com.tomerpacific.scheduler.ui.model
 
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class AppointmentModel(
     val appointmentDate: Long,
     val appointmentPlace: String,
