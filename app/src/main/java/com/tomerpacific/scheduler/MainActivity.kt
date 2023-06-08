@@ -21,7 +21,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.view.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
@@ -81,6 +84,8 @@ class MainActivity : ComponentActivity() {
                 }, onAppointmentCancelled = { appointmentAction, error ->
                     viewModel.updateScheduledAppointmentsForUser()
                     navController.navigate("appointment-set/${appointmentAction}/${error}")
+                }, onAppointmentClicked = { appointment ->
+                    navController.navigate("appointment/${appointment}")
                 })
             }
             composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
@@ -121,6 +126,23 @@ class MainActivity : ComponentActivity() {
                         onBackToAppointmentScreenPressed = {
                             navController.navigate(NAVIGATION_DESTINATION_APPOINTMENTS)
                         })
+                }
+            }
+            composable("appointment/{appointmentModel}",
+                arguments = listOf(
+                    navArgument("appointmentModel") { type = NavType.StringType })) {  backStackEntry ->
+                val appointmentString = backStackEntry.arguments?.getString("appointmentModel")
+                appointmentString?.let {
+                    val appointment = Json.decodeFromString<AppointmentModel>(it)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_black),
+                            contentDescription = "Logo",
+                            contentScale = ContentScale.Inside,
+                            modifier = Modifier.matchParentSize()
+                        )
+                        AppointmentScreen(appointment = appointment)
+                    }
                 }
             }
         }
