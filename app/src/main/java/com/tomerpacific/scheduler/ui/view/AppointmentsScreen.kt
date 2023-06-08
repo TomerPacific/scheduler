@@ -13,13 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.R
+import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
 fun AppointmentsScreen(viewModel: MainViewModel,
                        onUserLogout: () -> Unit,
                        onAddAppointmentClicked: () -> Unit,
-                       onAppointmentCancelled: (String?, String?) -> Unit) {
+                       onAppointmentCancelled: (String?, String?) -> Unit,
+                       onAppointmentClicked: (String) -> Unit) {
     val user = viewModel.user.observeAsState()
 
     Scaffold(floatingActionButton = {
@@ -43,7 +45,7 @@ fun AppointmentsScreen(viewModel: MainViewModel,
                         onUserLogout()
                     })
                 }
-                AppointmentsList(viewModel, onAppointmentCancelled)
+                AppointmentsList(viewModel, onAppointmentCancelled, onAppointmentClicked)
                 Row(modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.Center) {
                     CircularProgressBarIndicator(shouldBeDisplayed = user.value == null)
