@@ -9,7 +9,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +33,7 @@ fun AppointmentsList(viewModel: MainViewModel,
                      onAppointmentClicked: (String) -> Unit) {
 
     val appointments = viewModel.appointments.observeAsState()
+    val showDialog = remember { mutableStateOf(false) }
 
     if (appointments.value != null &&
         appointments.value!!.isNotEmpty()) {
@@ -64,16 +68,24 @@ fun AppointmentsList(viewModel: MainViewModel,
                         Icon(modifier = Modifier.padding(start = 5.dp),
                             imageVector = Icons.Default.SupervisedUserCircle,
                             contentDescription = "Cancel Icon")
-                        Text(text = Utils.convertTimestampToDate(appointment.appointmentDate).toString(),
+                        Text(text = "${Utils.convertTimestampToDate(appointment.appointmentDate)}",
                             fontSize = 15.sp)
                         TextButton(onClick = {
-                            viewModel.cancelScheduledAppointmentForUser(appointment, onAppointmentCancelled)
+                            showDialog.value = true
                         },
                             shape = RoundedCornerShape(50)
                         ) {
                             Text("Cancel", fontWeight = FontWeight.Bold)
                         }
                     }
+                }
+                if (showDialog.value) {
+                    ShowOnCancelAppointmentDialog(
+                        viewModel = viewModel,
+                        appointment = appointment,
+                        onAppointmentCancelled = onAppointmentCancelled,
+                        showDialog
+                    )
                 }
             }
         }
@@ -88,4 +100,32 @@ fun AppointmentsList(viewModel: MainViewModel,
     }
 
 
+}
+
+@Composable
+fun ShowOnCancelAppointmentDialog(viewModel: MainViewModel,
+                                  appointment: AppointmentModel,
+                                  onAppointmentCancelled: (String?, String?) -> Unit,
+                                  showDialog: MutableState<Boolean>) {
+    AlertDialog(
+        title = {
+                Text(text = "Do You Want To Cancel This Appointment?")
+        },
+        onDismissRequest = {
+           showDialog.value = false
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                viewModel.cancelScheduledAppointmentForUser(appointment, onAppointmentCancelled)
+            }) {
+                Text("Yes")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                showDialog.value = false
+            }) {
+                Text("No")
+            }
+        })
 }
