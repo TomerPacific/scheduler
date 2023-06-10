@@ -117,6 +117,7 @@ fun ShowOnCancelAppointmentDialog(viewModel: MainViewModel,
         confirmButton = {
             TextButton(onClick = {
                 viewModel.cancelScheduledAppointmentForUser(appointment, onAppointmentCancelled)
+                showDialog.value = false
             }) {
                 Text("Yes")
             }
