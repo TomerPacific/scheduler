@@ -12,30 +12,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 
 @Composable
 fun AppointmentScreen(appointment: AppointmentModel) {
-    Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
-        Text("Appointment Details",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center)
-    }
-    Column(modifier = Modifier.fillMaxSize().background(Color.White),
+    Column(modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center) {
-        Row(modifier = Modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.Top) {
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 200.dp),
+            horizontalArrangement = Arrangement.Center) {
+            Text("Appointment Details",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center)
+        }
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(1.dp)
+            .background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Text(
                 "Appointment Scheduled on : \n",
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center)
         }
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth()
+            .background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Icon(imageVector = Icons.Default.DateRange, contentDescription = "Date Icon")
             Text(
@@ -43,14 +48,15 @@ fun AppointmentScreen(appointment: AppointmentModel) {
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center)
         }
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth()
+            .background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Text(
                 "Appointment Duration : ${appointment.appointmentDuration}",
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center)
         }
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth().background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Text(
                 "Appointment Place : ${appointment.appointmentPlace}",
