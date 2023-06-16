@@ -35,18 +35,11 @@ fun AppointmentScreen(appointment: AppointmentModel) {
             .background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                "Appointment Scheduled on : \n",
+                "Appointment Scheduled on \n ${Utils.convertTimestampToDate(appointment.appointmentDate)}",
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center)
-        }
-        Row(modifier = Modifier.fillMaxWidth()
-            .background(Color.White),
-            horizontalArrangement = Arrangement.Center) {
-            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Date Icon")
-            Text(
-                "${Utils.convertTimestampToDate(appointment.appointmentDate)}",
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
         }
         Row(modifier = Modifier.fillMaxWidth()
             .background(Color.White),
