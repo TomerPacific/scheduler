@@ -31,8 +31,8 @@ fun AppointmentScreen(appointment: AppointmentModel) {
         }
         Row(modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(1.dp)
-            .background(Color.White),
+            .background(Color.White)
+            .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center) {
             Text(
                 "Appointment Scheduled on \n ${Utils.convertTimestampToDate(appointment.appointmentDate)}",
@@ -42,7 +42,8 @@ fun AppointmentScreen(appointment: AppointmentModel) {
             )
         }
         Row(modifier = Modifier.fillMaxWidth()
-            .background(Color.White),
+            .background(Color.White)
+            .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center) {
             Text(
                 "Appointment Duration : ${appointment.appointmentDuration}",
