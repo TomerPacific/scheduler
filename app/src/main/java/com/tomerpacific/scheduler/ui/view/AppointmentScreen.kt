@@ -2,14 +2,21 @@ package com.tomerpacific.scheduler.ui.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -19,6 +26,26 @@ import com.tomerpacific.scheduler.ui.model.AppointmentModel
 
 @Composable
 fun AppointmentScreen(appointment: AppointmentModel) {
+    val placeholderId = "id"
+    val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
+        append("Appointment Scheduled on \n")
+        appendInlineContent(placeholderId, "[icon]")
+        append("${Utils.convertTimestampToDate(appointment.appointmentDate)}")
+    }
+    val inlineContent = mapOf(
+        Pair(
+            placeholderId,
+            InlineTextContent(
+                Placeholder(
+                    width = 20.sp,
+                    height = 20.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
+            ) {
+                Icon(Icons.Filled.CalendarMonth, "", tint = Color.Black)
+            }
+        )
+    )
+
     Column(modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top) {
@@ -35,10 +62,11 @@ fun AppointmentScreen(appointment: AppointmentModel) {
             .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                "Appointment Scheduled on \n ${Utils.convertTimestampToDate(appointment.appointmentDate)}",
+                appointmentScheduledText,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 2
+                maxLines = 2,
+                inlineContent = inlineContent
             )
         }
         Row(modifier = Modifier.fillMaxWidth()
