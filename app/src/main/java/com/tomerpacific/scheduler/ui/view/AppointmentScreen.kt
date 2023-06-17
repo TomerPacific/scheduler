@@ -8,7 +8,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,15 +25,16 @@ import com.tomerpacific.scheduler.ui.model.AppointmentModel
 
 @Composable
 fun AppointmentScreen(appointment: AppointmentModel) {
-    val placeholderId = "id"
+
+    val calendarIconPlaceholderId = "id"
     val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
         append("Appointment Scheduled on \n")
-        appendInlineContent(placeholderId, "[icon]")
+        appendInlineContent(calendarIconPlaceholderId, "[icon]")
         append("${Utils.convertTimestampToDate(appointment.appointmentDate)}")
     }
-    val inlineContent = mapOf(
+    val appointmentScheduledInlineText = mapOf(
         Pair(
-            placeholderId,
+            calendarIconPlaceholderId,
             InlineTextContent(
                 Placeholder(
                     width = 20.sp,
@@ -66,7 +66,7 @@ fun AppointmentScreen(appointment: AppointmentModel) {
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
-                inlineContent = inlineContent
+                inlineContent = appointmentScheduledInlineText
             )
         }
         Row(modifier = Modifier.fillMaxWidth()
