@@ -8,6 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.HourglassFull
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,25 @@ fun AppointmentScreen(appointment: AppointmentModel) {
         )
     )
 
+    val appointmentDurationText: AnnotatedString = buildAnnotatedString {
+        append("Appointment Duration \n")
+        appendInlineContent(calendarIconPlaceholderId, "[icon]")
+        append(appointment.appointmentDuration)
+    }
+    val appointmentDurationInlineText = mapOf(
+        Pair(
+            calendarIconPlaceholderId,
+            InlineTextContent(
+                Placeholder(
+                    width = 20.sp,
+                    height = 20.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
+            ) {
+                Icon(Icons.Filled.HourglassFull, "", tint = Color.Black)
+            }
+        )
+    )
+
     Column(modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top) {
@@ -74,9 +94,11 @@ fun AppointmentScreen(appointment: AppointmentModel) {
             .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                "Appointment Duration : ${appointment.appointmentDuration}",
+                appointmentDurationText,
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                inlineContent = appointmentDurationInlineText)
         }
         Row(modifier = Modifier.fillMaxWidth().background(Color.White),
             horizontalArrangement = Arrangement.Center) {
