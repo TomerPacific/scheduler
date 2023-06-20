@@ -119,6 +119,9 @@ class DatabaseService {
                     viewModel.setAvailableAppointments(availableAppointments)
                 }
             }
+            .addOnFailureListener { error ->
+                print(error.localizedMessage)
+            }
 
     }
 
