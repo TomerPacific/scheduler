@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassFull
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ fun AppointmentScreen(appointment: AppointmentModel) {
         appendInlineContent(iconPlaceholderId, "[icon]")
         append("${Utils.convertTimestampToDate(appointment.appointmentDate)}")
     }
+
     val appointmentScheduledInlineText = mapOf(
         Pair(
             iconPlaceholderId,
@@ -52,6 +54,7 @@ fun AppointmentScreen(appointment: AppointmentModel) {
         appendInlineContent(iconPlaceholderId, "[icon]")
         append(appointment.appointmentDuration)
     }
+
     val appointmentDurationInlineText = mapOf(
         Pair(
             iconPlaceholderId,
@@ -62,6 +65,26 @@ fun AppointmentScreen(appointment: AppointmentModel) {
                     placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
             ) {
                 Icon(Icons.Filled.HourglassFull, "Hour glass icon", tint = Color.Black)
+            }
+        )
+    )
+
+    val appointmentPlaceText: AnnotatedString = buildAnnotatedString {
+        append("Appointment Place \n")
+        appendInlineContent(iconPlaceholderId, "[icon]")
+        append(appointment.appointmentPlace)
+    }
+
+    val appointmentPlaceInlineText = mapOf(
+        Pair(
+            iconPlaceholderId,
+            InlineTextContent(
+                Placeholder(
+                    width = 20.sp,
+                    height = 20.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
+            ) {
+                Icon(Icons.Filled.LocationOn, "Location icon", tint = Color.Black)
             }
         )
     )
@@ -103,9 +126,11 @@ fun AppointmentScreen(appointment: AppointmentModel) {
         Row(modifier = Modifier.fillMaxWidth().background(Color.White),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                "Appointment Place : ${appointment.appointmentPlace}",
+                appointmentPlaceText,
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                inlineContent = appointmentPlaceInlineText)
         }
     }
 }
