@@ -92,10 +92,10 @@ fun AppointmentScreen(appointment: AppointmentModel) {
     Column(modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top) {
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 200.dp),
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 230.dp),
             horizontalArrangement = Arrangement.Center) {
             Text("Appointment Details",
-                fontSize = 20.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center)
         }
