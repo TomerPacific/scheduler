@@ -27,41 +27,41 @@ import com.tomerpacific.scheduler.ui.model.AppointmentModel
 @Composable
 fun AppointmentScreen(appointment: AppointmentModel) {
 
-    val calendarIconPlaceholderId = "id"
+    val iconPlaceholderId = "iconPlaceholderId"
     val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
         append("Appointment Scheduled on \n")
-        appendInlineContent(calendarIconPlaceholderId, "[icon]")
+        appendInlineContent(iconPlaceholderId, "[icon]")
         append("${Utils.convertTimestampToDate(appointment.appointmentDate)}")
     }
     val appointmentScheduledInlineText = mapOf(
         Pair(
-            calendarIconPlaceholderId,
+            iconPlaceholderId,
             InlineTextContent(
                 Placeholder(
                     width = 20.sp,
                     height = 20.sp,
                     placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
             ) {
-                Icon(Icons.Filled.CalendarMonth, "", tint = Color.Black)
+                Icon(Icons.Filled.CalendarMonth, "Calendar icon", tint = Color.Black)
             }
         )
     )
 
     val appointmentDurationText: AnnotatedString = buildAnnotatedString {
         append("Appointment Duration \n")
-        appendInlineContent(calendarIconPlaceholderId, "[icon]")
+        appendInlineContent(iconPlaceholderId, "[icon]")
         append(appointment.appointmentDuration)
     }
     val appointmentDurationInlineText = mapOf(
         Pair(
-            calendarIconPlaceholderId,
+            iconPlaceholderId,
             InlineTextContent(
                 Placeholder(
                     width = 20.sp,
                     height = 20.sp,
                     placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
             ) {
-                Icon(Icons.Filled.HourglassFull, "", tint = Color.Black)
+                Icon(Icons.Filled.HourglassFull, "Hour glass icon", tint = Color.Black)
             }
         )
     )
