@@ -10,9 +10,10 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 import java.util.*
 import kotlin.collections.HashMap
 
-class DatabaseService {
+class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     private val database = Firebase.database.reference
+    private val remoteConfigService = _remoteConfigService
     private val APPOINTMENTS_KEY = "appointments"
     private val DATES_KEY = "dates"
 
@@ -170,8 +171,7 @@ class DatabaseService {
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
-        var startHour = START_HOUR_FOR_APPOINTMENTS
-
+        var startHour = remoteConfigService.getAppointmentStartTime()
         if (startDate.day == Date().day) {
             if (startDate.hours >= END_HOUR_FOR_APPOINTMENTS) {
                 return appointments
