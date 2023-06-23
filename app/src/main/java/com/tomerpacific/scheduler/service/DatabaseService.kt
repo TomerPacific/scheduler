@@ -172,15 +172,16 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
         var startHour = remoteConfigService.getAppointmentStartTime()
+        val endHour = remoteConfigService.getAppointmentEndTime()
         if (startDate.day == Date().day) {
-            if (startDate.hours >= END_HOUR_FOR_APPOINTMENTS) {
+            if (startDate.hours >= endHour) {
                 return appointments
-            } else if (startDate.hours in (START_HOUR_FOR_APPOINTMENTS + 1) until END_HOUR_FOR_APPOINTMENTS) {
+            } else if (startDate.hours in (START_HOUR_FOR_APPOINTMENTS + 1) until endHour) {
                 startHour = startDate.hours
             }
         }
 
-        for (i in startHour..19) {
+        for (i in startHour..endHour) {
             val appointment = AppointmentModel(
                 Utils.truncateTimestamp(startDate.time),
                 "",
