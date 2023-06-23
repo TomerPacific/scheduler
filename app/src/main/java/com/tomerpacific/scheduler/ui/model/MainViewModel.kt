@@ -10,6 +10,7 @@ import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
+import com.tomerpacific.scheduler.service.RemoteConfigService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -19,7 +20,8 @@ import java.util.*
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val authService: AuthService = AuthService()
-    private val databaseService: DatabaseService = DatabaseService()
+    private val remoteConfigService: RemoteConfigService = RemoteConfigService()
+    private val databaseService: DatabaseService = DatabaseService(remoteConfigService)
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
 
@@ -30,6 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
 
     init {
+
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
             databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
