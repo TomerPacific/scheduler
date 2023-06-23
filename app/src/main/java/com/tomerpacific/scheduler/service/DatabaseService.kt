@@ -175,8 +175,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         if (startDate.day == Date().day) {
             if (startDate.hours >= END_HOUR_FOR_APPOINTMENTS) {
                 return appointments
-            } else if (startDate.hours > START_HOUR_FOR_APPOINTMENTS &&
-                startDate.hours < END_HOUR_FOR_APPOINTMENTS) {
+            } else if (startDate.hours in (START_HOUR_FOR_APPOINTMENTS + 1) until END_HOUR_FOR_APPOINTMENTS) {
                 startHour = startDate.hours
             }
         }
