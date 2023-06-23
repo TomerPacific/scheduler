@@ -3,6 +3,7 @@ package com.tomerpacific.scheduler.service
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.tomerpacific.scheduler.R
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
 
 class RemoteConfigService {
@@ -15,6 +16,7 @@ class RemoteConfigService {
         }
 
         remoteConfig.setConfigSettingsAsync(remoteConfigSettings)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
         remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
