@@ -170,9 +170,14 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
+        if (Utils.isWeekend()) {
+            return appointments
+        }
+
         val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
-        var startHour = remoteConfigService.getAppointmentStartTime()
-        val endHour = remoteConfigService.getAppointmentEndTime()
+        val startAndEndTimeByDay = remoteConfigService.getAppointmentStartAndEndTimeByDay(startDate)
+        var startHour = startAndEndTimeByDay[0]
+        val endHour = startAndEndTimeByDay[1]
         if (startDate.day == Date().day) {
             if (startDate.hours >= endHour) {
                 return appointments
