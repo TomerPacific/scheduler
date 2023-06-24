@@ -1,6 +1,7 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -29,7 +30,7 @@ object Utils {
         var startAppointmentDate: Date = Date()
 
         if (dateToStart != null) {
-           val convertedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dateToStart), TimeZone.getDefault().toZoneId())
+            val convertedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dateToStart), TimeZone.getDefault().toZoneId())
             startAppointmentDate = Date.from(convertedDate.atZone(ZoneId.systemDefault()).toInstant())
             if (startAppointmentDate.day != Date().day) {
                 return startAppointmentDate.apply {
@@ -56,6 +57,11 @@ object Utils {
 
     fun getDayAndMonthFromLocalDateTime(date: LocalDateTime): String {
         return date.month.toString() + date.dayOfMonth
+    }
+
+    fun isWeekend(): Boolean {
+        val today = LocalDateTime.now()
+        return today.dayOfWeek == DayOfWeek.SATURDAY || today.dayOfWeek == DayOfWeek.SUNDAY
     }
 
 }
