@@ -14,8 +14,6 @@ import com.tomerpacific.scheduler.service.RemoteConfigService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -37,7 +35,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (_user.value != null) {
             databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
         }
-        databaseService.getAvailableAppointmentsForDate(this, Date().time)
+        databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
 
     }
 
@@ -105,7 +103,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getAppointmentsForDay(date: LocalDateTime) {
-        databaseService.getAvailableAppointmentsForDate(this, date.toInstant(ZoneOffset.UTC).toEpochMilli())
+        databaseService.getAvailableAppointmentsForDate(this, date)
     }
 
 }

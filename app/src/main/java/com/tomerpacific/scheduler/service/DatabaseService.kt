@@ -7,6 +7,10 @@ import com.google.firebase.ktx.Firebase
 import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import java.sql.Timestamp
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -102,9 +106,10 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
-    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
+    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
+        val timestamp = date.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()
         database.child(DATES_KEY)
-            .child(Utils.convertTimestampToDayAndMonth(date)).get()
+            .child(Utils.convertTimestampToDayAndMonth(timestamp)).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
                     val scheduledAppointments = mutableListOf<Long>()
@@ -168,7 +173,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
-    private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
+    private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: LocalDateTime): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
         if (Utils.isWeekend()) {
             return appointments
