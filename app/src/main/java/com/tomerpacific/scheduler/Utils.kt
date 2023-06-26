@@ -3,6 +3,7 @@ package com.tomerpacific.scheduler
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.time.DayOfWeek
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.util.*
 import kotlin.math.floor
@@ -25,22 +26,14 @@ object Utils {
         return floored.toLong()
     }
 
-    fun createStartDateForAppointmentsOfDay(dateToStart: LocalDateTime): Date {
-        var startAppointmentDate: Date = Date()
-
-        startAppointmentDate = Date.from(dateToStart.atZone(ZoneId.systemDefault()).toInstant())
-        if (startAppointmentDate.day != Date().day) {
-            return startAppointmentDate.apply {
-                hours = START_HOUR_FOR_APPOINTMENTS
-                minutes = 0
-                seconds = 0
+    fun createStartDateForAppointmentsOfDay(dateToStart: LocalDateTime): LocalDateTime {
+        return when (dateToStart.dayOfMonth != LocalDateTime.now().dayOfMonth) {
+            true -> dateToStart.with {
+                LocalTime.of(START_HOUR_FOR_APPOINTMENTS, 0)
             }
-        }
-
-        return startAppointmentDate.apply {
-            hours += 1
-            minutes = 0
-            seconds = 0
+            false -> dateToStart.with {
+                LocalTime.of(dateToStart.hour + 1, 0)
+            }
         }
     }
 
