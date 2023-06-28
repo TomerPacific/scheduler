@@ -28,12 +28,8 @@ object Utils {
 
     fun createStartDateForAppointmentsOfDay(dateToStart: LocalDateTime): LocalDateTime {
         return when (dateToStart.dayOfMonth != LocalDateTime.now().dayOfMonth) {
-            true -> dateToStart.with {
-                LocalTime.of(START_HOUR_FOR_APPOINTMENTS, 0)
-            }
-            false -> dateToStart.with {
-                LocalTime.of(dateToStart.hour + 1, 0)
-            }
+            true ->  dateToStart.withHour(START_HOUR_FOR_APPOINTMENTS).withMinute(0).withSecond(0)
+            false -> dateToStart.plusHours(1).withMinute(0).withSecond(0)
         }
     }
 
