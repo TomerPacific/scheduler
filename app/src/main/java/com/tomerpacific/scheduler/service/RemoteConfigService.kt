@@ -7,6 +7,7 @@ import com.tomerpacific.scheduler.END_HOUR_FOR_APPOINTMENTS
 import com.tomerpacific.scheduler.R
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
 import org.json.JSONObject
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 
@@ -30,8 +31,7 @@ class RemoteConfigService {
             }
     }
 
-    fun getAppointmentStartAndEndTimeByDay(date: Date): List<Int> {
-        val currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    fun getAppointmentStartAndEndTimeByDay(currentDate: LocalDateTime): List<Int> {
         val appointmentStartAndEndTimesFromConfig = remoteConfig.getString("appointment_start_and_end_times_by_day")
         val appointmentStartAndEndTimes = JSONObject(appointmentStartAndEndTimesFromConfig)
         val currentDay = currentDate.dayOfWeek.toString()

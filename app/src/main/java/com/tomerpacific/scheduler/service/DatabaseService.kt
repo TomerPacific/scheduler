@@ -7,9 +7,8 @@ import com.google.firebase.ktx.Firebase
 import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-import java.sql.Timestamp
-import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap
@@ -179,21 +178,22 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             return appointments
         }
 
-        val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
+        var startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
         val startAndEndTimeByDay = remoteConfigService.getAppointmentStartAndEndTimeByDay(startDate)
         var startHour = startAndEndTimeByDay[0]
         val endHour = startAndEndTimeByDay[1]
-        if (startDate.day == Date().day) {
-            if (startDate.hours >= endHour) {
+
+        if (startDate.dayOfMonth == LocalDateTime.now().dayOfMonth) {
+            if (startDate.hour >= endHour) {
                 return appointments
-            } else if (startDate.hours in (START_HOUR_FOR_APPOINTMENTS + 1) until endHour) {
-                startHour = startDate.hours
+            } else if (startDate.hour in (START_HOUR_FOR_APPOINTMENTS + 1) until endHour) {
+                startHour = startDate.hour
             }
         }
 
         for (i in startHour..endHour) {
             val appointment = AppointmentModel(
-                Utils.truncateTimestamp(startDate.time),
+                Utils.truncateTimestamp(startDate.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()),
                 "",
                 "one hour",
             null)
@@ -206,7 +206,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                 appointments.add(appointment)
             }
 
-            startDate.hours += 1
+            startDate = startDate.plusHours(1)
         }
 
         return appointments
