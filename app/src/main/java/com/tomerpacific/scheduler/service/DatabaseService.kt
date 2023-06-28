@@ -8,7 +8,6 @@ import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap

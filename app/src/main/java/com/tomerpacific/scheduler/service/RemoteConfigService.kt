@@ -8,8 +8,6 @@ import com.tomerpacific.scheduler.R
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
 import org.json.JSONObject
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.*
 
 class RemoteConfigService {
 

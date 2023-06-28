@@ -3,7 +3,6 @@ package com.tomerpacific.scheduler
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.util.*
 import kotlin.math.floor
