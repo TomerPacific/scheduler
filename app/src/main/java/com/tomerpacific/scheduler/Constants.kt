@@ -17,5 +17,6 @@ const val APPOINTMENT_ACTION_CANCEL = "cancel"
 const val APPOINTMENT_ACTION_KET = "appointmentAction"
 const val ERROR_MESSAGE_KEY = "errorMsg"
 
+const val REMOTE_CONFIG_APPOINTMENT_HOURS_KEY = "appointment_start_and_end_times_by_day"
 const val START_HOUR_FOR_APPOINTMENTS = 10
 const val END_HOUR_FOR_APPOINTMENTS = 19
