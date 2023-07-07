@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <defaultsMap>
     <entry>
-        <key>appointment_start_time</key>
-        <value>10</value>
+        <key>appointment_start_and_end_times_by_day</key>
+        <value>{"SUNDAY":[10,19],"MONDAY":[10,19],"TUESDAY":[10,19],"WEDNESDAY":[10,19],"THURSDAY":[10,19]}</value>
     </entry>
 </defaultsMap>
