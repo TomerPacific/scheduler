@@ -173,6 +173,8 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: LocalDateTime): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
+
+        //There can be no appointments available on the weekend
         if (Utils.isWeekend()) {
             return appointments
         }
