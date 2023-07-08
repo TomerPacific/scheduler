@@ -187,7 +187,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         if (startDate.dayOfMonth == LocalDateTime.now().dayOfMonth) {
             if (startDate.hour >= endHour) {
                 return appointments
-            } else if (startDate.hour in (START_HOUR_FOR_APPOINTMENTS + 1) until endHour) {
+            } else if (startDate.hour in (startHour + 1) until endHour) {
                 startHour = startDate.hour
             }
         }
