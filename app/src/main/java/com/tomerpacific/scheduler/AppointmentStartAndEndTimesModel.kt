@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FirebaseRemoteConfigurationsModel(
+data class AppointmentStartAndEndTimesModel(
     @SerialName("SUNDAY")
     val sunday: List<Int>,
     @SerialName("MONDAY")
@@ -14,7 +14,5 @@ data class FirebaseRemoteConfigurationsModel(
     @SerialName("WEDNESDAY")
     val wednesday: List<Int>,
     @SerialName("THURSDAY")
-    val thursday: List<Int>,
-    @SerialName("admin-email")
-    val adminEmail: String
+    val thursday: List<Int>
 )
