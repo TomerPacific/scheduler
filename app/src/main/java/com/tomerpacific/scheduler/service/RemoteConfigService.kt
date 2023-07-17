@@ -4,7 +4,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.tomerpacific.scheduler.END_HOUR_FOR_APPOINTMENTS
-import com.tomerpacific.scheduler.FirebaseRemoteConfigurationsModel
+import com.tomerpacific.scheduler.AppointmentStartAndEndTimesModel
 import com.tomerpacific.scheduler.R
 import com.tomerpacific.scheduler.REMOTE_CONFIG_APPOINTMENT_HOURS_KEY
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
@@ -14,7 +14,8 @@ import java.time.LocalDateTime
 class RemoteConfigService {
 
     private val remoteConfig = Firebase.remoteConfig
-    private lateinit var firebaseRemoteConfigurationsModel: FirebaseRemoteConfigurationsModel
+    private lateinit var appointmentStartAndEndTimes: AppointmentStartAndEndTimesModel
+    private lateinit var adminUserEmail: String
 
     init {
         val remoteConfigSettings = remoteConfigSettings {
@@ -28,9 +29,10 @@ class RemoteConfigService {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val appointmentStartAndEndTimesFromConfig = remoteConfig.getString(REMOTE_CONFIG_APPOINTMENT_HOURS_KEY)
-                    firebaseRemoteConfigurationsModel = Json.decodeFromString(
-                        FirebaseRemoteConfigurationsModel.serializer(),
+                    appointmentStartAndEndTimes = Json.decodeFromString(
+                        AppointmentStartAndEndTimesModel.serializer(),
                         appointmentStartAndEndTimesFromConfig)
+                    adminUserEmail = remoteConfig.getString("admin_email")
                 }
             }.addOnFailureListener { error ->
                 print(error.localizedMessage)
@@ -39,14 +41,17 @@ class RemoteConfigService {
 
     fun getAppointmentStartAndEndTimeByDay(currentDate: LocalDateTime): List<Int> {
         return when (currentDate.dayOfWeek.toString()) {
-            "SUNDAY" -> firebaseRemoteConfigurationsModel.sunday
-            "MONDAY" -> firebaseRemoteConfigurationsModel.monday
-            "TUESDAY" -> firebaseRemoteConfigurationsModel.tuesday
-            "WEDNESDAY" -> firebaseRemoteConfigurationsModel.wednesday
-            "THURSDAY" -> firebaseRemoteConfigurationsModel.thursday
+            "SUNDAY" -> appointmentStartAndEndTimes.sunday
+            "MONDAY" -> appointmentStartAndEndTimes.monday
+            "TUESDAY" -> appointmentStartAndEndTimes.tuesday
+            "WEDNESDAY" -> appointmentStartAndEndTimes.wednesday
+            "THURSDAY" -> appointmentStartAndEndTimes.thursday
             else -> listOf(START_HOUR_FOR_APPOINTMENTS, END_HOUR_FOR_APPOINTMENTS)
         }
     }
 
+    fun isAdminUser(email: String): Boolean {
+        return email == adminUserEmail
+    }
 
 }
