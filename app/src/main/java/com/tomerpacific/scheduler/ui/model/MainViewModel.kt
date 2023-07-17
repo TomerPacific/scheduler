@@ -17,8 +17,8 @@ import java.time.LocalDateTime
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val authService: AuthService = AuthService()
     private val remoteConfigService: RemoteConfigService = RemoteConfigService()
+    private val authService: AuthService = AuthService(remoteConfigService)
     private val databaseService: DatabaseService = DatabaseService(remoteConfigService)
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
@@ -71,6 +71,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun logout() {
         authService.logOutUser()
+    }
+
+    fun isAdminUser(): Boolean {
+        return when(_user.value!!.email) {
+            null -> false
+            else -> authService.isAdminUser(_user.value!!.email!!)
+        }
     }
 
     fun getStartDestination(): String {
