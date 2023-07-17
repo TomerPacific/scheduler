@@ -8,9 +8,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class AuthService {
+class AuthService(remoteConfigurationService: RemoteConfigService) {
 
     private val auth: FirebaseAuth = Firebase.auth
+    private val remoteConfigService: RemoteConfigService = remoteConfigurationService
 
     fun isUserCurrentlySignedIn(): Boolean {
         return auth.currentUser != null
@@ -35,4 +36,9 @@ class AuthService {
     fun getCurrentlySignedInUser(): FirebaseUser? {
         return auth.currentUser
     }
+
+    fun isAdminUser(email: String): Boolean {
+        return remoteConfigService.isAdminUser(email)
+    }
+
 }
