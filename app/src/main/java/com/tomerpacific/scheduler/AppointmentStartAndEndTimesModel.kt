@@ -14,5 +14,7 @@ data class FirebaseRemoteConfigurationsModel(
     @SerialName("WEDNESDAY")
     val wednesday: List<Int>,
     @SerialName("THURSDAY")
-    val thursday: List<Int>
+    val thursday: List<Int>,
+    @SerialName("admin-email")
+    val adminEmail: String
 )
