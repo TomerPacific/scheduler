@@ -6,6 +6,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.tomerpacific.scheduler.END_HOUR_FOR_APPOINTMENTS
 import com.tomerpacific.scheduler.AppointmentStartAndEndTimesModel
 import com.tomerpacific.scheduler.R
+import com.tomerpacific.scheduler.REMOTE_CONFIG_ADMIN_EMAIL_KEY
 import com.tomerpacific.scheduler.REMOTE_CONFIG_APPOINTMENT_HOURS_KEY
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
 import kotlinx.serialization.json.Json
@@ -32,7 +33,7 @@ class RemoteConfigService {
                     appointmentStartAndEndTimes = Json.decodeFromString(
                         AppointmentStartAndEndTimesModel.serializer(),
                         appointmentStartAndEndTimesFromConfig)
-                    adminUserEmail = remoteConfig.getString("admin_email")
+                    adminUserEmail = remoteConfig.getString(REMOTE_CONFIG_ADMIN_EMAIL_KEY)
                 }
             }.addOnFailureListener { error ->
                 print(error.localizedMessage)
