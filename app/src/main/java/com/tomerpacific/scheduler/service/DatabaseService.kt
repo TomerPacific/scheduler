@@ -213,30 +213,19 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         return appointments
     }
 
-    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
-
-        val pastAppointments = mutableListOf<AppointmentModel>()
+    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel, isAdmin: Boolean) {
 
         database.child(APPOINTMENTS_KEY).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
                     val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
                     if (scheduledAppointments != null) {
-                        val userAppointments = scheduledAppointments[user.uid]
-                        val appointments = mutableListOf<AppointmentModel>()
-                        if (userAppointments != null) {
-                            for (userAppointment in userAppointments.keys) {
-                                val appointment = userAppointments[userAppointment]!!
-                                if (!Utils.isAppointmentDatePassed(appointment)) {
-                                    appointments.add(appointment)
-                                } else {
-                                    pastAppointments.add(appointment)
-                                }
-                            }
-                            viewModel.setScheduledAppointments(scheduledAppointments = appointments)
-                            if (pastAppointments.isNotEmpty()) {
-                                removePastAppointmentsForUser(user, pastAppointments)
-                            }
+                        when (isAdmin) {
+                            true -> collectScheduledAppointmentsForAdminUser(scheduledAppointments, viewModel)
+                            false -> collectScheduledAppointmentsForRegularUser(
+                            scheduledAppointments,
+                            user,
+                            viewModel)
                         }
                     } else {
                         viewModel.setScheduledAppointments(scheduledAppointments = listOf())
@@ -244,4 +233,41 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                 }
             }
         }
+
+    private fun collectScheduledAppointmentsForAdminUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
+                                                         viewModel: MainViewModel) {
+        val appointments = mutableListOf<AppointmentModel>()
+        for (userId in scheduledAppointments.keys) {
+            val userAppointments: HashMap<String, AppointmentModel> = scheduledAppointments[userId]!!
+                for (userAppointment in userAppointments.keys) {
+                    val appointment = userAppointments[userAppointment]!!
+                    if (!Utils.isAppointmentDatePassed(appointment)) {
+                        appointments.add(appointment)
+                    }
+                }
+        }
+        viewModel.setScheduledAppointments(scheduledAppointments = appointments)
+    }
+
+    private fun collectScheduledAppointmentsForRegularUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
+                                                           user: FirebaseUser,
+                                                           viewModel: MainViewModel) {
+        val pastAppointments = mutableListOf<AppointmentModel>()
+        val userAppointments = scheduledAppointments[user.uid]
+        val appointments = mutableListOf<AppointmentModel>()
+        if (userAppointments != null) {
+            for (userAppointment in userAppointments.keys) {
+                val appointment = userAppointments[userAppointment]!!
+                if (!Utils.isAppointmentDatePassed(appointment)) {
+                    appointments.add(appointment)
+                } else {
+                    pastAppointments.add(appointment)
+                }
+            }
+            viewModel.setScheduledAppointments(scheduledAppointments = appointments)
+            if (pastAppointments.isNotEmpty()) {
+                removePastAppointmentsForUser(user, pastAppointments)
+            }
+        }
+    }
 }
