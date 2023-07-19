@@ -1,7 +1,7 @@
 package com.tomerpacific.scheduler
 
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
-import java.time.Instant
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -25,26 +25,10 @@ object Utils {
         return floored.toLong()
     }
 
-    fun createStartDateForAppointmentsOfDay(dateToStart: Long?): Date {
-        var startAppointmentDate: Date = Date()
-
-        if (dateToStart != null) {
-           val convertedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dateToStart), TimeZone.getDefault().toZoneId())
-            startAppointmentDate = Date.from(convertedDate.atZone(ZoneId.systemDefault()).toInstant())
-            if (startAppointmentDate.day != Date().day) {
-                return startAppointmentDate.apply {
-                    hours = START_HOUR_FOR_APPOINTMENTS
-                    minutes = 0
-                    seconds = 0
-                }
-            }
-        }
-
-
-        return startAppointmentDate.apply {
-            hours += 1
-            minutes = 0
-            seconds = 0
+    fun createStartDateForAppointmentsOfDay(dateToStart: LocalDateTime): LocalDateTime {
+        return when (dateToStart.dayOfMonth != LocalDateTime.now().dayOfMonth) {
+            true ->  dateToStart.withHour(START_HOUR_FOR_APPOINTMENTS).withMinute(0).withSecond(0)
+            false -> dateToStart.plusHours(1).withMinute(0).withSecond(0)
         }
     }
 
@@ -56,6 +40,11 @@ object Utils {
 
     fun getDayAndMonthFromLocalDateTime(date: LocalDateTime): String {
         return date.month.toString() + date.dayOfMonth
+    }
+
+    fun isWeekend(): Boolean {
+        val today = LocalDateTime.now()
+        return today.dayOfWeek == DayOfWeek.SATURDAY || today.dayOfWeek == DayOfWeek.SUNDAY
     }
 
 }

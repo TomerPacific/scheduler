@@ -10,16 +10,16 @@ import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
+import com.tomerpacific.scheduler.service.RemoteConfigService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val authService: AuthService = AuthService()
-    private val databaseService: DatabaseService = DatabaseService()
+    private val remoteConfigService: RemoteConfigService = RemoteConfigService()
+    private val authService: AuthService = AuthService(remoteConfigService)
+    private val databaseService: DatabaseService = DatabaseService(remoteConfigService)
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
 
@@ -30,11 +30,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
 
     init {
+
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
         }
-        databaseService.getAvailableAppointmentsForDate(this, Date().time)
+        databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
 
     }
 
@@ -72,6 +73,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         authService.logOutUser()
     }
 
+    fun isAdminUser(): Boolean {
+        _user.value?.let {
+            return when(it.email) {
+                null -> false
+                else -> authService.isAdminUser(it.email!!)
+            }
+        }
+
+        return  false
+    }
+
     fun getStartDestination(): String {
         return when (isUserConnected()) {
             true -> NAVIGATION_DESTINATION_APPOINTMENTS
@@ -93,7 +105,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateScheduledAppointmentsForUser() {
-        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
+        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
     }
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
@@ -102,7 +114,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getAppointmentsForDay(date: LocalDateTime) {
-        databaseService.getAvailableAppointmentsForDate(this, date.toInstant(ZoneOffset.UTC).toEpochMilli())
+        databaseService.getAvailableAppointmentsForDate(this, date)
     }
 
 }

@@ -7,12 +7,15 @@ import com.google.firebase.ktx.Firebase
 import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap
 
-class DatabaseService {
+class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     private val database = Firebase.database.reference
+    private val remoteConfigService = _remoteConfigService
     private val APPOINTMENTS_KEY = "appointments"
     private val DATES_KEY = "dates"
 
@@ -101,9 +104,10 @@ class DatabaseService {
             }
     }
 
-    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: Long) {
+    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
+        val timestamp = date.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()
         database.child(DATES_KEY)
-            .child(Utils.convertTimestampToDayAndMonth(date)).get()
+            .child(Utils.convertTimestampToDayAndMonth(timestamp)).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
                     val scheduledAppointments = mutableListOf<Long>()
@@ -118,6 +122,9 @@ class DatabaseService {
                     val availableAppointments = createAppointmentsForDay(scheduledAppointments, date)
                     viewModel.setAvailableAppointments(availableAppointments)
                 }
+            }
+            .addOnFailureListener { error ->
+                print(error.localizedMessage)
             }
 
     }
@@ -164,23 +171,30 @@ class DatabaseService {
             }
     }
 
-    private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: Long): MutableList<AppointmentModel> {
+    private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: LocalDateTime): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
-        val startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
-        var startHour = START_HOUR_FOR_APPOINTMENTS
 
-        if (startDate.day == Date().day) {
-            if (startDate.hours >= END_HOUR_FOR_APPOINTMENTS) {
+        //There can be no appointments available on the weekend
+        if (Utils.isWeekend()) {
+            return appointments
+        }
+
+        var startDate = Utils.createStartDateForAppointmentsOfDay(dateToStart = date)
+        val startAndEndTimeByDay = remoteConfigService.getAppointmentStartAndEndTimeByDay(startDate)
+        var startHour = startAndEndTimeByDay[0]
+        val endHour = startAndEndTimeByDay[1]
+
+        if (startDate.dayOfMonth == LocalDateTime.now().dayOfMonth) {
+            if (startDate.hour >= endHour) {
                 return appointments
-            } else if (startDate.hours > START_HOUR_FOR_APPOINTMENTS &&
-                startDate.hours < END_HOUR_FOR_APPOINTMENTS) {
-                startHour = startDate.hours
+            } else if (startDate.hour in (startHour + 1) until endHour) {
+                startHour = startDate.hour
             }
         }
 
-        for (i in startHour..19) {
+        for (i in startHour..endHour) {
             val appointment = AppointmentModel(
-                Utils.truncateTimestamp(startDate.time),
+                Utils.truncateTimestamp(startDate.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()),
                 "",
                 "one hour",
             null)
@@ -193,36 +207,25 @@ class DatabaseService {
                 appointments.add(appointment)
             }
 
-            startDate.hours += 1
+            startDate = startDate.plusHours(1)
         }
 
         return appointments
     }
 
-    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel) {
-
-        val pastAppointments = mutableListOf<AppointmentModel>()
+    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel, isAdmin: Boolean) {
 
         database.child(APPOINTMENTS_KEY).get()
             .addOnCompleteListener { result ->
                 if (result.isSuccessful) {
                     val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
                     if (scheduledAppointments != null) {
-                        val userAppointments = scheduledAppointments[user.uid]
-                        val appointments = mutableListOf<AppointmentModel>()
-                        if (userAppointments != null) {
-                            for (userAppointment in userAppointments.keys) {
-                                val appointment = userAppointments[userAppointment]!!
-                                if (!Utils.isAppointmentDatePassed(appointment)) {
-                                    appointments.add(appointment)
-                                } else {
-                                    pastAppointments.add(appointment)
-                                }
-                            }
-                            viewModel.setScheduledAppointments(scheduledAppointments = appointments)
-                            if (pastAppointments.isNotEmpty()) {
-                                removePastAppointmentsForUser(user, pastAppointments)
-                            }
+                        when (isAdmin) {
+                            true -> collectScheduledAppointmentsForAdminUser(scheduledAppointments, viewModel)
+                            false -> collectScheduledAppointmentsForRegularUser(
+                            scheduledAppointments,
+                            user,
+                            viewModel)
                         }
                     } else {
                         viewModel.setScheduledAppointments(scheduledAppointments = listOf())
@@ -230,4 +233,41 @@ class DatabaseService {
                 }
             }
         }
+
+    private fun collectScheduledAppointmentsForAdminUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
+                                                         viewModel: MainViewModel) {
+        val appointments = mutableListOf<AppointmentModel>()
+        for (userId in scheduledAppointments.keys) {
+            val userAppointments: HashMap<String, AppointmentModel> = scheduledAppointments[userId]!!
+                for (userAppointment in userAppointments.keys) {
+                    val appointment = userAppointments[userAppointment]!!
+                    if (!Utils.isAppointmentDatePassed(appointment)) {
+                        appointments.add(appointment)
+                    }
+                }
+        }
+        viewModel.setScheduledAppointments(scheduledAppointments = appointments)
+    }
+
+    private fun collectScheduledAppointmentsForRegularUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
+                                                           user: FirebaseUser,
+                                                           viewModel: MainViewModel) {
+        val pastAppointments = mutableListOf<AppointmentModel>()
+        val userAppointments = scheduledAppointments[user.uid]
+        val appointments = mutableListOf<AppointmentModel>()
+        if (userAppointments != null) {
+            for (userAppointment in userAppointments.keys) {
+                val appointment = userAppointments[userAppointment]!!
+                if (!Utils.isAppointmentDatePassed(appointment)) {
+                    appointments.add(appointment)
+                } else {
+                    pastAppointments.add(appointment)
+                }
+            }
+            viewModel.setScheduledAppointments(scheduledAppointments = appointments)
+            if (pastAppointments.isNotEmpty()) {
+                removePastAppointmentsForUser(user, pastAppointments)
+            }
+        }
+    }
 }

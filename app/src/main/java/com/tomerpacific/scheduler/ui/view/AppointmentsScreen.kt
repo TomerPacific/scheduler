@@ -25,8 +25,10 @@ fun AppointmentsScreen(viewModel: MainViewModel,
     val user = viewModel.user.observeAsState()
 
     Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = { onAddAppointmentClicked() }) {
-            Icon(Icons.Default.Add, contentDescription = "Add Appointment")
+        if (!viewModel.isAdminUser()) {
+            FloatingActionButton(onClick = { onAddAppointmentClicked() }) {
+                Icon(Icons.Default.Add, contentDescription = "Add Appointment")
+            }
         }
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
