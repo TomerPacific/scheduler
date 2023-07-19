@@ -33,7 +33,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
         }
         databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
 
@@ -74,10 +74,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isAdminUser(): Boolean {
-        return when(_user.value!!.email) {
-            null -> false
-            else -> authService.isAdminUser(_user.value!!.email!!)
+        _user.value?.let {
+            return when(it.email) {
+                null -> false
+                else -> authService.isAdminUser(it.email!!)
+            }
         }
+
+        return  false
     }
 
     fun getStartDestination(): String {
@@ -101,7 +105,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateScheduledAppointmentsForUser() {
-        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this)
+        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
     }
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
