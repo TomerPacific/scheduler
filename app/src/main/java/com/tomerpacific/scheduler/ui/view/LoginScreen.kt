@@ -94,16 +94,14 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
                 horizontalArrangement = Arrangement.SpaceEvenly) {
                 TextButton(onClick = {
                     if (viewModel.isUserInputValid(email.text, password.text)) {
-                       viewModel.loginUser(email.text, password.text)
-                        onNavigateAfterLoginScreen()
+                        viewModel.loginUser(email.text, password.text, onNavigateAfterLoginScreen)
                     }
                 }) {
                     Text("Login", fontWeight = FontWeight.Bold)
                 }
                 TextButton(onClick = {
                     if (viewModel.isUserInputValid(email.text, password.text)) {
-                        viewModel.signupUser(email.text, password.text)
-                        onNavigateAfterLoginScreen()
+                        viewModel.signupUser(email.text, password.text, onNavigateAfterLoginScreen)
                     }
                 }) {
                     Text("Sign up", fontWeight = FontWeight.Bold)
