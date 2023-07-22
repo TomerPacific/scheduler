@@ -30,11 +30,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
 
     init {
-
-        _user.value = authService.getCurrentlySignedInUser()
-        if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
-        }
+        remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
         databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
 
     }
@@ -43,22 +39,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return email.isNotEmpty() && password.isNotEmpty()
     }
 
-    fun signupUser(email: String, password: String) {
+    fun signupUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         viewModelScope.launch {
             coroutineScope {
                 launch {
                     _user.value = authService.signupUser(email, password)
+                    onNavigateAfterLoginScreen()
                 }
             }
 
         }
     }
 
-    fun loginUser(email: String, password: String) {
+    fun loginUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         viewModelScope.launch {
             coroutineScope {
                 launch {
                     _user.value = authService.logInUser(email, password)
+                    onNavigateAfterLoginScreen()
                 }
             }
 
@@ -115,6 +113,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getAppointmentsForDay(date: LocalDateTime) {
         databaseService.getAvailableAppointmentsForDate(this, date)
+    }
+
+    private fun remoteConfigurationActivatedSuccess() {
+        _user.value = authService.getCurrentlySignedInUser()
+        if (_user.value != null) {
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+        }
+    }
+
+    private fun remoteConfigurationActivatedFailure(errorMsg: String) {
+
     }
 
 }
