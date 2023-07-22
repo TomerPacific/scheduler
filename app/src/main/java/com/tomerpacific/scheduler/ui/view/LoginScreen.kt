@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,8 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 
 @Composable
 fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit) {
+
+    val shouldDisplayCircularProgressBar = viewModel.shouldDisplayCircularProgressBar.observeAsState()
 
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
@@ -107,6 +110,7 @@ fun LoginScreen(viewModel: MainViewModel, onNavigateAfterLoginScreen: () -> Unit
                     Text("Sign up", fontWeight = FontWeight.Bold)
                 }
             }
+            CircularProgressBarIndicator(shouldBeDisplayed = shouldDisplayCircularProgressBar.value!!)
         }
     }
 }
