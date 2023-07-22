@@ -29,6 +29,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _availableAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
     val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
 
+    private val _shouldDisplayCircularProgressBar: MutableLiveData<Boolean> = MutableLiveData(false)
+    val shouldDisplayCircularProgressBar: LiveData<Boolean> = _shouldDisplayCircularProgressBar
+
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
         databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
@@ -40,10 +43,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun signupUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
+        _shouldDisplayCircularProgressBar.value = true
         viewModelScope.launch {
             coroutineScope {
                 launch {
                     _user.value = authService.signupUser(email, password)
+                    _shouldDisplayCircularProgressBar.value = false
                     onNavigateAfterLoginScreen()
                 }
             }
@@ -52,10 +57,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loginUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
+        _shouldDisplayCircularProgressBar.value = true
         viewModelScope.launch {
             coroutineScope {
                 launch {
                     _user.value = authService.logInUser(email, password)
+                    _shouldDisplayCircularProgressBar.value = false
                     onNavigateAfterLoginScreen()
                 }
             }
