@@ -48,7 +48,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             coroutineScope {
                 launch {
                     _user.value = authService.signupUser(email, password)
-                    _shouldDisplayCircularProgressBar.value = false
                     onNavigateAfterLoginScreen()
                 }
             }
@@ -62,7 +61,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             coroutineScope {
                 launch {
                     _user.value = authService.logInUser(email, password)
-                    _shouldDisplayCircularProgressBar.value = false
                     onNavigateAfterLoginScreen()
                 }
             }
@@ -131,6 +129,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun remoteConfigurationActivatedFailure(errorMsg: String) {
 
+    }
+
+    fun disableCircularProgressBarIndicator() {
+        _shouldDisplayCircularProgressBar.value = false
     }
 
 }
