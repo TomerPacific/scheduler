@@ -128,7 +128,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun remoteConfigurationActivatedFailure(errorMsg: String) {
-
+        _user.value = authService.getCurrentlySignedInUser()
+        if (_user.value != null) {
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+        }
     }
 
     fun disableCircularProgressBarIndicator() {
