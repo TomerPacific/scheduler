@@ -25,7 +25,9 @@ class RemoteConfigService {
 
         remoteConfig.setConfigSettingsAsync(remoteConfigSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+    }
 
+    fun fetchAndActivate(onRemoteConfigurationActivatedSuccess: () -> Unit, onRemoteConfigurationActivatedFailure: (String) -> Unit) {
         remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -34,9 +36,14 @@ class RemoteConfigService {
                         AppointmentStartAndEndTimesModel.serializer(),
                         appointmentStartAndEndTimesFromConfig)
                     adminUserEmail = remoteConfig.getString(REMOTE_CONFIG_ADMIN_EMAIL_KEY)
+                    onRemoteConfigurationActivatedSuccess()
                 }
             }.addOnFailureListener { error ->
                 print(error.localizedMessage)
+                error.localizedMessage?.let {
+                    onRemoteConfigurationActivatedFailure(it)
+                }
+
             }
     }
 
