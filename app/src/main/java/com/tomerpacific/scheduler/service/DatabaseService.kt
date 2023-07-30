@@ -11,6 +11,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
@@ -171,6 +173,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: LocalDateTime): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
 
@@ -196,7 +199,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             val appointment = AppointmentModel(
                 Utils.truncateTimestamp(startDate.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()),
                 "",
-                "one hour",
+                Duration.hours(1).toIsoString(),
             null)
 
             val appointmentExists = scheduledAppointments.filter { scheduledAppointment ->
