@@ -2,6 +2,7 @@ package com.tomerpacific.scheduler.ui.model
 
 import kotlinx.serialization.Serializable
 import java.util.*
+import kotlin.time.Duration
 
 @Serializable
 data class AppointmentModel(
@@ -18,5 +19,5 @@ data class AppointmentModel(
         }
     }
 
-    constructor() : this(0, "", "", "")
+    constructor() : this(0, "", Duration.ZERO.toIsoString(), "")
 }
