@@ -47,7 +47,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                 }
             }
 
-            if (availableAppointments == null || availableAppointments.isEmpty()) {
+            if (availableAppointments.isNullOrEmpty()) {
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
