@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import kotlin.time.Duration
 
 @Composable
 fun AppointmentScreen(appointment: AppointmentModel) {
@@ -52,7 +53,7 @@ fun AppointmentScreen(appointment: AppointmentModel) {
     val appointmentDurationText: AnnotatedString = buildAnnotatedString {
         append("Appointment Duration \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
-        append(appointment.appointmentDuration)
+        append(Duration.parseIsoString(appointment.appointmentDuration).toString())
     }
 
     val appointmentDurationInlineText = mapOf(
