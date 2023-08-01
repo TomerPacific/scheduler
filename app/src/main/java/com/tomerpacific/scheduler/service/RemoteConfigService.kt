@@ -4,10 +4,15 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.tomerpacific.scheduler.END_HOUR_FOR_APPOINTMENTS
-import com.tomerpacific.scheduler.AppointmentStartAndEndTimesModel
+import com.tomerpacific.scheduler.ui.model.AppointmentStartAndEndTimesModel
 import com.tomerpacific.scheduler.R
 import com.tomerpacific.scheduler.REMOTE_CONFIG_ADMIN_EMAIL_KEY
 import com.tomerpacific.scheduler.REMOTE_CONFIG_APPOINTMENT_HOURS_KEY
+import com.tomerpacific.scheduler.REMOTE_CONFIG_MONDAY_KEY
+import com.tomerpacific.scheduler.REMOTE_CONFIG_SUNDAY_KEY
+import com.tomerpacific.scheduler.REMOTE_CONFIG_THURSDAY_KEY
+import com.tomerpacific.scheduler.REMOTE_CONFIG_TUESDAY_KEY
+import com.tomerpacific.scheduler.REMOTE_CONFIG_WEDNESDAY_KEY
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
@@ -49,11 +54,11 @@ class RemoteConfigService {
 
     fun getAppointmentStartAndEndTimeByDay(currentDate: LocalDateTime): List<Int> {
         return when (currentDate.dayOfWeek.toString()) {
-            "SUNDAY" -> appointmentStartAndEndTimes.sunday
-            "MONDAY" -> appointmentStartAndEndTimes.monday
-            "TUESDAY" -> appointmentStartAndEndTimes.tuesday
-            "WEDNESDAY" -> appointmentStartAndEndTimes.wednesday
-            "THURSDAY" -> appointmentStartAndEndTimes.thursday
+            REMOTE_CONFIG_SUNDAY_KEY -> appointmentStartAndEndTimes.sunday
+            REMOTE_CONFIG_MONDAY_KEY -> appointmentStartAndEndTimes.monday
+            REMOTE_CONFIG_TUESDAY_KEY -> appointmentStartAndEndTimes.tuesday
+            REMOTE_CONFIG_WEDNESDAY_KEY -> appointmentStartAndEndTimes.wednesday
+            REMOTE_CONFIG_THURSDAY_KEY -> appointmentStartAndEndTimes.thursday
             else -> listOf(START_HOUR_FOR_APPOINTMENTS, END_HOUR_FOR_APPOINTMENTS)
         }
     }
