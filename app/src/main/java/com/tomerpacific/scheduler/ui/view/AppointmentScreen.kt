@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -27,7 +28,7 @@ import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import kotlin.time.Duration
 
 @Composable
-fun AppointmentScreen(appointment: AppointmentModel) {
+fun AppointmentScreen(appointment: AppointmentModel, onAddLocationPressed: () -> Unit) {
 
     val iconPlaceholderId = "iconPlaceholderId"
     val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
@@ -93,7 +94,9 @@ fun AppointmentScreen(appointment: AppointmentModel) {
     Column(modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top) {
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 230.dp),
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 230.dp),
             horizontalArrangement = Arrangement.Center) {
             Text("Appointment Details",
                 fontSize = 25.sp,
@@ -113,7 +116,8 @@ fun AppointmentScreen(appointment: AppointmentModel) {
                 inlineContent = appointmentScheduledInlineText
             )
         }
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .background(Color.White)
             .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.Center) {
@@ -124,14 +128,25 @@ fun AppointmentScreen(appointment: AppointmentModel) {
                 maxLines = 2,
                 inlineContent = appointmentDurationInlineText)
         }
-        Row(modifier = Modifier.fillMaxWidth().background(Color.White),
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
             horizontalArrangement = Arrangement.Center) {
-            Text(
-                appointmentPlaceText,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                inlineContent = appointmentPlaceInlineText)
+            if (appointment.appointmentPlace.isNullOrEmpty()) {
+                Button(onClick = {
+                    onAddLocationPressed()
+                }) {
+                    Text("Add A Location")
+                }
+            } else {
+                Text(
+                    appointmentPlaceText,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    inlineContent = appointmentPlaceInlineText)
+            }
+
         }
     }
 }
