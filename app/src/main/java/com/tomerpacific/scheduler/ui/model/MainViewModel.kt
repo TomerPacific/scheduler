@@ -1,15 +1,20 @@
 package com.tomerpacific.scheduler.ui.model
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseUser
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
+import com.tomerpacific.scheduler.service.PermissionService
 import com.tomerpacific.scheduler.service.RemoteConfigService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -17,9 +22,12 @@ import java.time.LocalDateTime
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+
+    private val applicationContext = application
     private val remoteConfigService: RemoteConfigService = RemoteConfigService()
     private val authService: AuthService = AuthService(remoteConfigService)
     private val databaseService: DatabaseService = DatabaseService(remoteConfigService)
+    private val locationService: PermissionService = PermissionService()
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
 
@@ -31,6 +39,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _shouldDisplayCircularProgressBar: MutableLiveData<Boolean> = MutableLiveData(false)
     val shouldDisplayCircularProgressBar: LiveData<Boolean> = _shouldDisplayCircularProgressBar
+
+    private val _currentLocation: MutableLiveData<LatLng> = MutableLiveData()
+    val currentLocation: LiveData<LatLng> = _currentLocation
 
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
@@ -136,6 +147,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun disableCircularProgressBarIndicator() {
         _shouldDisplayCircularProgressBar.value = false
+    }
+
+    fun isLocationPermissionGranted(): Boolean {
+        return locationService.areLocationPermissionsGranted(applicationContext)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun updateLocation() {
+        val fusedLocation = LocationServices.getFusedLocationProviderClient(
+            applicationContext)
+
+        fusedLocation.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    _currentLocation.value = LatLng(location.latitude, location.longitude)
+                }
+            }
     }
 
 }
