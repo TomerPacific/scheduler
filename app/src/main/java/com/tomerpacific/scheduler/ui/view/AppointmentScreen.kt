@@ -28,7 +28,8 @@ import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import kotlin.time.Duration
 
 @Composable
-fun AppointmentScreen(appointment: AppointmentModel, onAddLocationPressed: () -> Unit) {
+fun AppointmentScreen(appointment: AppointmentModel,
+                      onAddLocationPressed: () -> Unit) {
 
     val iconPlaceholderId = "iconPlaceholderId"
     val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
