@@ -106,18 +106,6 @@ class MainActivity : ComponentActivity() {
                         })
                 }
             }
-            composable("location") {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo_black),
-                            contentDescription = "Logo",
-                            contentScale = ContentScale.Inside,
-                            modifier = Modifier.matchParentSize()
-                        )
-                        LocationPermissionScreen(LocationServices.getFusedLocationProviderClient(
-                            LocalContext.current))
-                    }
-            }
             composable(
                 "appointment-set/{appointmentAction}/{errorMsg}",
                 arguments = listOf(
@@ -159,6 +147,17 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("location")
                         })
                     }
+                }
+            }
+            composable("location") {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_black),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    LocationPermissionScreen(viewModel)
                 }
             }
         }
