@@ -16,12 +16,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -39,31 +36,31 @@ import com.tomerpacific.scheduler.ui.model.MainViewModel
 @SuppressLint("MissingPermission", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LocationPermissionScreen(viewModel: MainViewModel) {
-    val snackbarHostState: SnackbarHostState = SnackbarHostState()
+    val snackbarHostState = SnackbarHostState()
     val scaffoldState: ScaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
+    val areLocationPermissionsGranted = viewModel.areLocationPermissionsGranted.observeAsState()
+    val currentLocation = viewModel.currentLocation.observeAsState()
+    val isWaitingForLocationPermissions = remember {
+        mutableStateOf(!areLocationPermissionsGranted.value!!)
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
     ) {
-        LocationPermissionHandler(viewModel, scaffoldState)
+        if (!isWaitingForLocationPermissions.value) {
+            DrawMap(currentLocation = currentLocation)
+        } else {
+            CircularProgressBarIndicator(shouldBeDisplayed = isWaitingForLocationPermissions.value)
+            LocationPermissionHandler(viewModel, scaffoldState, areLocationPermissionsGranted)
+        }
     }
-
-
    
 }
 
 @Composable
-fun LocationPermissionHandler(viewModel: MainViewModel, scaffoldState: ScaffoldState) {
-
-    var isLocationPermissionGranted: Boolean by remember {
-        mutableStateOf(viewModel.isLocationPermissionGranted())
-    }
-
-    var isLoading: Boolean by remember {
-        mutableStateOf(true)
-    }
-
-    val currentLocation = viewModel.currentLocation.observeAsState()
+fun LocationPermissionHandler(viewModel: MainViewModel,
+                              scaffoldState: ScaffoldState,
+                              areLocationPermissionsGranted: State<Boolean?>) {
 
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -75,7 +72,7 @@ fun LocationPermissionHandler(viewModel: MainViewModel, scaffoldState: ScaffoldS
     ) { permissionsMap ->
         if (permissionsMap.isNotEmpty()) {
             val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
-            isLocationPermissionGranted = areGranted
+            viewModel.setAreLocationPermissionsGranted(areGranted)
         }
     }
 
@@ -86,24 +83,18 @@ fun LocationPermissionHandler(viewModel: MainViewModel, scaffoldState: ScaffoldS
             activity,
             Manifest.permission.ACCESS_FINE_LOCATION
         )
-
-
-    if (!isLocationPermissionGranted && !shouldShowLocationPermissionRationale) {
-        LaunchedEffect(isLocationPermissionGranted) {
+    if (shouldShowLocationPermissionRationale) {
+        ShowLocationPermissionRationale(scaffoldState)
+    } else {
+        LaunchedEffect(true) {
             launcherMultiplePermissions.launch(permissions)
         }
-    } else if (isLocationPermissionGranted) {
-        isLoading = false
-        viewModel.updateLocation()
-    } else if (!isLocationPermissionGranted && shouldShowLocationPermissionRationale){
-        ShowLocationPermissionRationale(scaffoldState)
     }
-
-    DrawMap(isLocationPermissionGranted, isLoading, currentLocation)
 }
 
 @Composable
 fun ShowLocationPermissionRationale(scaffoldState: ScaffoldState) {
+
     LaunchedEffect(true) {
             val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(
                 message = "In order to choose an appointment place, you need to authorize location permissions",
@@ -113,6 +104,10 @@ fun ShowLocationPermissionRationale(scaffoldState: ScaffoldState) {
             when (snackbarResult) {
                 SnackbarResult.Dismissed -> {
 
+//                    Text("No Location Permission",
+//                            fontWeight = FontWeight.Bold,
+//                            fontSize = 25.sp,
+//                            textAlign = TextAlign.Center)
                 }
 
                 SnackbarResult.ActionPerformed -> {
@@ -124,32 +119,21 @@ fun ShowLocationPermissionRationale(scaffoldState: ScaffoldState) {
 }
 
 @Composable
-fun DrawMap(isLocationPermissionGranted: Boolean,
-            isLoading: Boolean, currentLocation: State<LatLng?>
-) {
-
-    if (!isLocationPermissionGranted && !isLoading) {
-        Text("No Location Permission",
-            fontWeight = FontWeight.Bold,
-            fontSize = 25.sp,
-            textAlign = TextAlign.Center)
-    } else if (isLocationPermissionGranted && !isLoading && currentLocation.value != null){
-        val cameraPositionState = rememberCameraPositionState {
+fun DrawMap(currentLocation: State<LatLng?>) {
+    val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(LatLng(
                 currentLocation.value!!.latitude,
                 currentLocation.value!!.longitude),
                 16f)
         }
-        Column() {
-            GoogleMap(
-                cameraPositionState = cameraPositionState,
-                modifier = Modifier.weight(1.0f),
-                properties = MapProperties(isMyLocationEnabled = true),
-                uiSettings = MapUiSettings(compassEnabled = true)
-            ) {}
-        }
-    } else {
-        CircularProgressBarIndicator(shouldBeDisplayed = isLoading)
-    }
+    Column() {
+        GoogleMap(
+            cameraPositionState = cameraPositionState,
+            modifier = Modifier.weight(1.0f),
+            properties = MapProperties(isMyLocationEnabled = true),
+            uiSettings = MapUiSettings(compassEnabled = true)
+        ) {
 
+        }
+    }
 }
