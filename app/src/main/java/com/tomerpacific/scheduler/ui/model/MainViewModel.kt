@@ -14,7 +14,6 @@ import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
-import com.tomerpacific.scheduler.service.PermissionService
 import com.tomerpacific.scheduler.service.RemoteConfigService
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -27,7 +26,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val remoteConfigService: RemoteConfigService = RemoteConfigService()
     private val authService: AuthService = AuthService(remoteConfigService)
     private val databaseService: DatabaseService = DatabaseService(remoteConfigService)
-    private val locationService: PermissionService = PermissionService()
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
 
@@ -46,7 +44,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
         databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
-
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -147,10 +144,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun disableCircularProgressBarIndicator() {
         _shouldDisplayCircularProgressBar.value = false
-    }
-
-    fun isLocationPermissionGranted(): Boolean {
-        return locationService.areLocationPermissionsGranted(applicationContext)
     }
 
     @SuppressLint("MissingPermission")
