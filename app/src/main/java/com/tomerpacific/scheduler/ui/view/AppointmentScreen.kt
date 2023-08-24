@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
-import com.tomerpacific.scheduler.ui.model.MainViewModel
 import kotlin.time.Duration
 
 @Composable

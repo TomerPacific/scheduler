@@ -15,14 +15,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.android.gms.location.LocationServices
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.view.*
 import kotlinx.serialization.decodeFromString
@@ -143,9 +141,11 @@ class MainActivity : ComponentActivity() {
                             contentScale = ContentScale.Inside,
                             modifier = Modifier.matchParentSize()
                         )
-                        AppointmentScreen(appointment = appointment, onAddLocationPressed = {
-                            navController.navigate("location")
-                        })
+                        AppointmentScreen(appointment = appointment,
+                            onAddLocationPressed = {
+                                navController.navigate("location")
+                             }
+                        )
                     }
                 }
             }
@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity() {
                         contentScale = ContentScale.Inside,
                         modifier = Modifier.matchParentSize()
                     )
-                    LocationPermissionScreen(viewModel)
+                    ChooseAppointmentLocationScreen(viewModel)
                 }
             }
         }
