@@ -3,7 +3,6 @@ package com.tomerpacific.scheduler.ui.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -35,11 +33,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun ChooseAppointmentLocationScreen(viewModel: MainViewModel) {
+fun ChooseAppointmentLocationScreen(viewModel: MainViewModel,
+                                    onUserChoseCurrentLocation: () -> Unit) {
     val currentLocation = viewModel.currentLocation.observeAsState()
 
     if (currentLocation.value == null) {
-        ShowCurrentLocationDialog(viewModel = viewModel)
+        ShowCurrentLocationDialog(viewModel = viewModel, onUserChoseCurrentLocation)
     } else {
         DrawMap(currentLocation = currentLocation)
     }
@@ -48,7 +47,7 @@ fun ChooseAppointmentLocationScreen(viewModel: MainViewModel) {
 
 
 @Composable
-fun ShowCurrentLocationDialog(viewModel: MainViewModel) {
+fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocation: () -> Unit) {
 
     val shouldDialogBeDismissed = remember {
         mutableStateOf(false)
@@ -68,10 +67,10 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel) {
                 }
             },
             confirmButton = {
-
                 Button(onClick = {
                     viewModel.updateLocation()
                     shouldDialogBeDismissed.value = true
+                    onUserChoseCurrentLocation()
                 }) {
                     Text("Confirm")
                 }
@@ -97,8 +96,6 @@ fun DrawMap(currentLocation: State<LatLng?>) {
     val locationName = remember {
         mutableStateOf("")
     }
-
-
 
     Column {
         Row(modifier = Modifier

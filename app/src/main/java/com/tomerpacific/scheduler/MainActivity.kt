@@ -157,7 +157,9 @@ class MainActivity : ComponentActivity() {
                         contentScale = ContentScale.Inside,
                         modifier = Modifier.matchParentSize()
                     )
-                    ChooseAppointmentLocationScreen(viewModel)
+                    ChooseAppointmentLocationScreen(viewModel, onUserChoseCurrentLocation = {
+                        navController.popBackStack()
+                    })
                 }
             }
         }
