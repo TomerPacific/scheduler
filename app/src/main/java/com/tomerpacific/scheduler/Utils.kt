@@ -42,9 +42,13 @@ object Utils {
         return date.month.toString() + date.dayOfMonth
     }
 
-    fun isWeekend(): Boolean {
+    fun isWeekend(currentDay: DayOfWeek? = null): Boolean {
+        val dayToCheck = when (currentDay) {
+            null -> LocalDateTime.now().dayOfWeek
+            else -> currentDay
+        }
         val today = LocalDateTime.now()
-        return today.dayOfWeek == DayOfWeek.SATURDAY || today.dayOfWeek == DayOfWeek.SUNDAY
+        return dayToCheck == DayOfWeek.SATURDAY || dayToCheck == DayOfWeek.SUNDAY
     }
 
 }
