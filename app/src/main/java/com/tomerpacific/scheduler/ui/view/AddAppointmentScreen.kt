@@ -32,6 +32,8 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
     }
 
     val availableAppointments = viewModel.availableAppointments.observeAsState().value
+    val isWeekend = Utils.isWeekend(currentDate.dayOfWeek)
+
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             item {
@@ -40,7 +42,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp)) {
-                    Text("Schedule An Appointment",
+                    Text(text = "Schedule An Appointment",
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp,
                         textAlign = TextAlign.Center)
@@ -52,7 +54,12 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     Row(verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                         Text(
-                            text = "There are no available appointments. Please try again later.",
+                            modifier = Modifier.fillMaxWidth(),
+                            text = if (isWeekend) {
+                                "There are no available appointments on the weekend."
+                                } else {
+                                "There are no available appointments. Please try again later."
+                               },
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
