@@ -35,8 +35,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
-        databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
-
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
