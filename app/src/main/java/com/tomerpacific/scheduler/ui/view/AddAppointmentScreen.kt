@@ -31,7 +31,9 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
         mutableStateOf(calculatePreviousDayButtonEnabledState(currentDate))
     }
 
-    val availableAppointments = viewModel.availableAppointments.observeAsState().value
+    viewModel.getAppointmentsForDay(currentDate)
+
+    val availableAppointments = viewModel.availableAppointments.observeAsState()
     val isWeekend = Utils.isWeekend(currentDate.dayOfWeek)
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -49,7 +51,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                 }
             }
 
-            if (availableAppointments.isNullOrEmpty()) {
+            if (availableAppointments.value.isNullOrEmpty()) {
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
@@ -67,7 +69,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     }
                 }
             } else {
-                items(availableAppointments) { appointment ->
+                items(availableAppointments.value!!) { appointment ->
                     Card(modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
