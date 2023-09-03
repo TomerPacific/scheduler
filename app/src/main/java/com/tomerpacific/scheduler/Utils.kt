@@ -47,7 +47,7 @@ object Utils {
             null -> LocalDateTime.now().dayOfWeek
             else -> day
         }
-        val today = LocalDateTime.now()
+
         return dayToCheck == DayOfWeek.SATURDAY || dayToCheck == DayOfWeek.SUNDAY
     }
 
