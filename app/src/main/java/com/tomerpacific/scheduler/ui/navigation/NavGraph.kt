@@ -26,6 +26,7 @@ import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
+import com.tomerpacific.scheduler.ui.view.ChooseAppointmentLocationScreen
 import com.tomerpacific.scheduler.ui.view.LoginScreen
 import com.tomerpacific.scheduler.ui.view.SplashScreen
 import kotlinx.serialization.decodeFromString
@@ -129,8 +130,23 @@ fun NavGraph(
                         contentScale = ContentScale.Inside,
                         modifier = Modifier.matchParentSize()
                     )
-                    AppointmentScreen(appointment = appointment)
+                    AppointmentScreen(appointment = appointment, onAddLocationPressed = {
+                        navController.navigate("location")
+                    })
                 }
+            }
+        }
+        composable("location") {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_black),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier.matchParentSize()
+                )
+                ChooseAppointmentLocationScreen(viewModel, onUserChoseCurrentLocation = {
+                    navController.popBackStack()
+                })
             }
         }
     }
