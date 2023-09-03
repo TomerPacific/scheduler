@@ -4,28 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.theme.SchedulerTheme
-import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.tomerpacific.scheduler.ui.model.AppointmentModel
-import com.tomerpacific.scheduler.ui.view.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-
+import com.tomerpacific.scheduler.ui.navigation.NavGraph
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
@@ -39,6 +24,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
+<<<<<<< HEAD
                     NavGraph(startDestination = NAVIGATION_DESTINATION_SPLASH)
                 }
             }
@@ -147,6 +133,9 @@ class MainActivity : ComponentActivity() {
                              }
                         )
                     }
+=======
+                    NavGraph(viewModel, startDestination = NAVIGATION_DESTINATION_SPLASH)
+>>>>>>> main
                 }
             }
             composable("location") {

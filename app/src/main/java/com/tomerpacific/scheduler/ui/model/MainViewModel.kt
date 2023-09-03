@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseUser
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
+import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import com.tomerpacific.scheduler.service.RemoteConfigService
@@ -43,7 +44,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
-        databaseService.getAvailableAppointmentsForDate(this, LocalDateTime.now())
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -125,6 +125,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getAppointmentsForDay(date: LocalDateTime) {
+        if (Utils.isWeekend(date.dayOfWeek)) {
+            setAvailableAppointments(listOf())
+            return
+        }
         databaseService.getAvailableAppointmentsForDate(this, date)
     }
 
