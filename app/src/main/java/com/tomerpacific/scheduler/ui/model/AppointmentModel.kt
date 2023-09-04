@@ -7,7 +7,7 @@ import kotlin.time.Duration
 @Serializable
 data class AppointmentModel(
     val appointmentDate: Long,
-    val appointmentPlace: String,
+    var appointmentPlace: String,
     val appointmentDuration: String,
     var userId: String?,
     val appointmentId: String = generateId()
