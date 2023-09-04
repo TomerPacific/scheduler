@@ -17,6 +17,8 @@ import com.tomerpacific.scheduler.APPOINTMENT_ACTION_KET
 import com.tomerpacific.scheduler.ERROR_MESSAGE_KEY
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_ADD_APPOINTMENT
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENT_SCREEN
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOCATION_SCREEN
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_SPLASH
 import com.tomerpacific.scheduler.R
@@ -71,7 +73,7 @@ fun NavGraph(
                 viewModel.updateScheduledAppointmentsForUser()
                 navController.navigate("appointment-set/${appointmentAction}/${error}")
             }, onAppointmentClicked = {
-                navController.navigate("appointment-screen")
+                navController.navigate(NAVIGATION_DESTINATION_APPOINTMENT_SCREEN)
             })
         }
         composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
@@ -114,7 +116,7 @@ fun NavGraph(
                     })
             }
         }
-        composable("appointment-screen") {
+        composable(NAVIGATION_DESTINATION_APPOINTMENT_SCREEN) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_black),
@@ -123,11 +125,11 @@ fun NavGraph(
                     modifier = Modifier.matchParentSize()
                 )
                 AppointmentScreen(viewModel, onAddLocationPressed = {
-                    navController.navigate("location")
+                    navController.navigate(NAVIGATION_DESTINATION_LOCATION_SCREEN)
                 })
             }
         }
-        composable("location") {
+        composable(NAVIGATION_DESTINATION_LOCATION_SCREEN) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_black),
