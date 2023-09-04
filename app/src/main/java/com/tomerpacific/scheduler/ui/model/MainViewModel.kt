@@ -166,7 +166,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .addOnSuccessListener { location ->
                 if (location != null) {
                     _currentLocation.value = LatLng(location.latitude, location.longitude)
-                    _currentScheduledAppointment.value!!.appointmentPlace = _currentLocation.value!!.toString()
+                    _currentScheduledAppointment.value!!.appointmentPlace = "${location.latitude},${location.longitude}"
 
                     val index = _scheduledAppointments.value!!.indices.find {
                         _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
