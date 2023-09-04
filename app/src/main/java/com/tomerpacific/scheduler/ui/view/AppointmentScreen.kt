@@ -1,6 +1,8 @@
 package com.tomerpacific.scheduler.ui.view
 
 import android.Manifest
+import android.content.Context
+import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -29,8 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.maps.model.LatLng
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 @Composable
@@ -43,6 +48,8 @@ fun AppointmentScreen(viewModel: MainViewModel,
         mutableStateOf(false)
     }
 
+    val context = LocalContext.current
+
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isPermissionGranted ->
@@ -54,7 +61,7 @@ fun AppointmentScreen(viewModel: MainViewModel,
     )
 
     val iconPlaceholderId = "iconPlaceholderId"
-    val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
+    val appointmentScheduledText = buildAnnotatedString {
         append("Appointment Scheduled on \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
         append("${Utils.convertTimestampToDate(scheduledAppointment.value!!.appointmentDate)}")
@@ -95,12 +102,6 @@ fun AppointmentScreen(viewModel: MainViewModel,
             }
         )
     )
-
-    val appointmentPlaceText: AnnotatedString = buildAnnotatedString {
-        append("Appointment Place \n")
-        appendInlineContent(iconPlaceholderId, "[icon]")
-        append(scheduledAppointment.value!!.appointmentPlace)
-    }
 
     val appointmentPlaceInlineText = mapOf(
         Pair(
@@ -183,7 +184,7 @@ fun AppointmentScreen(viewModel: MainViewModel,
                 }
             } else {
                 Text(
-                    appointmentPlaceText,
+                    getAppointmentPlaceText(context , iconPlaceholderId, scheduledAppointment.value!!.appointmentPlace),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     maxLines = 2,
@@ -193,4 +194,25 @@ fun AppointmentScreen(viewModel: MainViewModel,
 
         }
     }
+}
+
+fun getAppointmentPlaceText(context: Context,
+                            iconPlaceholderId: String,
+                            coordinates: String): AnnotatedString {
+    return buildAnnotatedString {
+        append("Appointment Place \n")
+        appendInlineContent(iconPlaceholderId, "[icon]")
+        append(getAddress(context, coordinates))
+    }
+}
+
+fun getAddress(context: Context, coordinates: String): String {
+    if (coordinates.isEmpty()) {
+        return ""
+    }
+    val latitudeAndLongitude = coordinates.split(",")
+    val latLng: LatLng = LatLng(latitudeAndLongitude[0].toDouble(), latitudeAndLongitude[1].toDouble())
+    val geoCoder: Geocoder = Geocoder(context)
+    val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+    return address?.get(0)?.getAddressLine(0).toString()
 }
