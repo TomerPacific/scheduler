@@ -173,6 +173,27 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
+    fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
+        database.child(APPOINTMENTS_KEY).child(user.uid).get()
+            .addOnCompleteListener { result ->
+                if (result.isSuccessful) {
+                    val scheduledAppointments = result.result.getValue<HashMap<String, AppointmentModel>>()
+                    if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentId)) {
+                        scheduledAppointments[appointment.appointmentId] = appointment
+                    }
+                    database.child(APPOINTMENTS_KEY)
+                        .child(user.uid)
+                        .setValue(scheduledAppointments)
+                        .addOnCompleteListener {
+
+                        }
+                        .addOnFailureListener {
+
+                        }
+                }
+            }
+    }
+
     @OptIn(ExperimentalTime::class)
     private fun createAppointmentsForDay(scheduledAppointments: List<Long>, date: LocalDateTime): MutableList<AppointmentModel> {
         val appointments: MutableList<AppointmentModel> = mutableListOf()
