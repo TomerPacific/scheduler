@@ -42,6 +42,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentLocation: MutableLiveData<LatLng> = MutableLiveData()
     val currentLocation: LiveData<LatLng> = _currentLocation
 
+    private val _currentScheduledAppointment: MutableLiveData<AppointmentModel> = MutableLiveData()
+    val currentScheduledAppointment: LiveData<AppointmentModel> = _currentScheduledAppointment
+
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
     }
@@ -150,6 +153,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _shouldDisplayCircularProgressBar.value = false
     }
 
+    fun setCurrentScheduledAppointment(appointment: AppointmentModel) {
+        _currentScheduledAppointment.value = appointment
+    }
+
     @SuppressLint("MissingPermission")
     fun updateLocation() {
         val fusedLocation = LocationServices.getFusedLocationProviderClient(
@@ -159,6 +166,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .addOnSuccessListener { location ->
                 if (location != null) {
                     _currentLocation.value = LatLng(location.latitude, location.longitude)
+                    _currentScheduledAppointment.value!!.appointmentPlace = _currentLocation.value!!.toString()
+
+                    val index = _scheduledAppointments.value!!.indices.find {
+                        _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
+                    }
+                    index?.let {
+                        _scheduledAppointments.value!!.toMutableList().set(it, _currentScheduledAppointment.value!!)
+                    }
                 }
             }
     }
