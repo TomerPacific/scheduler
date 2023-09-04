@@ -172,7 +172,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
                     }
                     index?.let {
-                        _scheduledAppointments.value!!.toMutableList().set(it, _currentScheduledAppointment.value!!)
+                        _scheduledAppointments.value!!.toMutableList()[it] =
+                            _currentScheduledAppointment.value!!
+                        updateScheduledAppointmentsForUser()
                     }
                 }
             }
