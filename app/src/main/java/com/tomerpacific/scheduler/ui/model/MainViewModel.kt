@@ -174,7 +174,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     index?.let {
                         _scheduledAppointments.value!!.toMutableList()[it] =
                             _currentScheduledAppointment.value!!
-                        updateScheduledAppointmentsForUser()
+                        databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
                     }
                 }
             }
