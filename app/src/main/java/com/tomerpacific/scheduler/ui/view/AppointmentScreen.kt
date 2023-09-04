@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassFull
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,12 +30,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
-import com.tomerpacific.scheduler.ui.model.AppointmentModel
+import com.tomerpacific.scheduler.ui.model.MainViewModel
 import kotlin.time.Duration
 
 @Composable
-fun AppointmentScreen(appointment: AppointmentModel,
+fun AppointmentScreen(viewModel: MainViewModel,
                       onAddLocationPressed: () -> Unit) {
+
+    val scheduledAppointment = viewModel.currentScheduledAppointment.observeAsState()
 
     val areLocationPermissionsGranted = remember {
         mutableStateOf(false)
@@ -54,7 +57,7 @@ fun AppointmentScreen(appointment: AppointmentModel,
     val appointmentScheduledText: AnnotatedString = buildAnnotatedString {
         append("Appointment Scheduled on \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
-        append("${Utils.convertTimestampToDate(appointment.appointmentDate)}")
+        append("${Utils.convertTimestampToDate(scheduledAppointment.value!!.appointmentDate)}")
     }
 
     val appointmentScheduledInlineText = mapOf(
@@ -75,7 +78,7 @@ fun AppointmentScreen(appointment: AppointmentModel,
     val appointmentDurationText: AnnotatedString = buildAnnotatedString {
         append("Appointment Duration \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
-        append(Duration.parseIsoString(appointment.appointmentDuration).toString())
+        append(Duration.parseIsoString(scheduledAppointment.value!!.appointmentDuration).toString())
     }
 
     val appointmentDurationInlineText = mapOf(
@@ -96,7 +99,7 @@ fun AppointmentScreen(appointment: AppointmentModel,
     val appointmentPlaceText: AnnotatedString = buildAnnotatedString {
         append("Appointment Place \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
-        append(appointment.appointmentPlace)
+        append(scheduledAppointment.value!!.appointmentPlace)
     }
 
     val appointmentPlaceInlineText = mapOf(
@@ -168,7 +171,7 @@ fun AppointmentScreen(appointment: AppointmentModel,
                 .background(Color.White),
             horizontalArrangement = Arrangement.Center
         ) {
-            if (appointment.appointmentPlace.isEmpty()) {
+            if (scheduledAppointment.value!!.appointmentPlace.isEmpty()) {
                 Button(onClick = {
                     if (areLocationPermissionsGranted.value) {
                         onAddLocationPressed()

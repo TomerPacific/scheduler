@@ -20,7 +20,6 @@ import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_SPLASH
 import com.tomerpacific.scheduler.R
-import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentScreen
@@ -29,8 +28,6 @@ import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
 import com.tomerpacific.scheduler.ui.view.ChooseAppointmentLocationScreen
 import com.tomerpacific.scheduler.ui.view.LoginScreen
 import com.tomerpacific.scheduler.ui.view.SplashScreen
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 
 @Composable
@@ -73,8 +70,8 @@ fun NavGraph(
             }, onAppointmentCancelled = { appointmentAction, error ->
                 viewModel.updateScheduledAppointmentsForUser()
                 navController.navigate("appointment-set/${appointmentAction}/${error}")
-            }, onAppointmentClicked = { appointment ->
-                navController.navigate("appointment/${appointment}")
+            }, onAppointmentClicked = {
+                navController.navigate("appointment-screen")
             })
         }
         composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
@@ -117,23 +114,17 @@ fun NavGraph(
                     })
             }
         }
-        composable("appointment/{appointmentModel}",
-            arguments = listOf(
-                navArgument("appointmentModel") { type = NavType.StringType })) { backStackEntry ->
-            val appointmentString = backStackEntry.arguments?.getString("appointmentModel")
-            appointmentString?.let {
-                val appointment = Json.decodeFromString<AppointmentModel>(it)
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_black),
-                        contentDescription = "Logo",
-                        contentScale = ContentScale.Inside,
-                        modifier = Modifier.matchParentSize()
-                    )
-                    AppointmentScreen(appointment = appointment, onAddLocationPressed = {
-                        navController.navigate("location")
-                    })
-                }
+        composable("appointment-screen") {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_black),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier.matchParentSize()
+                )
+                AppointmentScreen(viewModel, onAddLocationPressed = {
+                    navController.navigate("location")
+                })
             }
         }
         composable("location") {
