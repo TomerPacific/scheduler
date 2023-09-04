@@ -32,7 +32,7 @@ fun AppointmentsList(viewModel: MainViewModel,
                      onAppointmentCancelled: (String?, String?) -> Unit,
                      onAppointmentClicked: (String) -> Unit) {
 
-    val appointments = viewModel.appointments.observeAsState()
+    val appointments = viewModel.scheduledAppointments.observeAsState()
     val showDialog = remember { mutableStateOf(false) }
 
     if (appointments.value != null &&

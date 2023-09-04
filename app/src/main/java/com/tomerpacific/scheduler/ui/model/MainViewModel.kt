@@ -30,8 +30,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _user: MutableLiveData<FirebaseUser> = MutableLiveData()
     val user: LiveData<FirebaseUser?> = _user
 
-    private val _appointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
-    val appointments: LiveData<List<AppointmentModel>> = _appointments
+    private val _scheduledAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
+    val scheduledAppointments: LiveData<List<AppointmentModel>> = _scheduledAppointments
 
     private val _availableAppointments: MutableLiveData<List<AppointmentModel>> = MutableLiveData()
     val availableAppointments: LiveData<List<AppointmentModel>> = _availableAppointments
@@ -112,7 +112,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setScheduledAppointments(scheduledAppointments: List<AppointmentModel>) {
-        _appointments.value = scheduledAppointments
+        _scheduledAppointments.value = scheduledAppointments
     }
 
     fun updateScheduledAppointmentsForUser() {
