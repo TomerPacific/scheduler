@@ -32,10 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.maps.model.LatLng
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 @Composable
@@ -169,6 +167,7 @@ fun AppointmentScreen(viewModel: MainViewModel,
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .background(Color.White),
             horizontalArrangement = Arrangement.Center
         ) {
@@ -183,15 +182,22 @@ fun AppointmentScreen(viewModel: MainViewModel,
                     Text("Add A Location")
                 }
             } else {
-                Text(
-                    getAppointmentPlaceText(context , iconPlaceholderId, scheduledAppointment.value!!.appointmentPlace),
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    inlineContent = appointmentPlaceInlineText
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    Text(
+                        getAppointmentPlaceText(context , iconPlaceholderId, scheduledAppointment.value!!.appointmentPlace),
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        inlineContent = appointmentPlaceInlineText
+                    )
+                    Button(onClick = {
+                        onAddLocationPressed()
+                    }) {
+                        Text("Change Location?")
+                    }
+                }
             }
-
         }
     }
 }
@@ -210,9 +216,9 @@ fun getAddress(context: Context, coordinates: String): String {
     if (coordinates.isEmpty()) {
         return ""
     }
-    val latitudeAndLongitude = coordinates.split(",")
-    val latLng: LatLng = LatLng(latitudeAndLongitude[0].toDouble(), latitudeAndLongitude[1].toDouble())
+
+    val userLocation = Utils.convertToLatLng(coordinates)
     val geoCoder: Geocoder = Geocoder(context)
-    val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+    val address = geoCoder.getFromLocation(userLocation.latitude, userLocation.longitude, 1)
     return address?.get(0)?.getAddressLine(0).toString()
 }
