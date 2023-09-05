@@ -1,5 +1,6 @@
 package com.tomerpacific.scheduler
 
+import com.google.android.gms.maps.model.LatLng
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -49,6 +50,11 @@ object Utils {
         }
 
         return dayToCheck == DayOfWeek.SATURDAY || dayToCheck == DayOfWeek.SUNDAY
+    }
+
+    fun convertToLatLng(location: String): LatLng {
+        val latitudeAndLongitude = location.split(",")
+        return LatLng(latitudeAndLongitude[0].toDouble(), latitudeAndLongitude[1].toDouble())
     }
 
 }
