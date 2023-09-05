@@ -155,6 +155,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setCurrentScheduledAppointment(appointment: AppointmentModel) {
         _currentScheduledAppointment.value = appointment
+        val userLocation = _currentScheduledAppointment.value!!.appointmentPlace
+        _currentLocation.value = Utils.convertToLatLng(userLocation)
     }
 
     @SuppressLint("MissingPermission")
