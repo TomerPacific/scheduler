@@ -162,7 +162,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     @SuppressLint("MissingPermission")
-    fun updateLocation() {
+    fun updateLocation(shouldUpdateAppointmentLocation: Boolean) {
+
+        if (!shouldUpdateAppointmentLocation) {
+            _currentLocation.value = LatLng(32.307800, -64.750504)
+            return
+        }
+
         val fusedLocation = LocationServices.getFusedLocationProviderClient(
             applicationContext)
 
