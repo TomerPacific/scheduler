@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChooseAppointmentLocationScreen(viewModel: MainViewModel,
                                     onUserChoseCurrentLocation: () -> Unit) {
+    
     val currentLocation = viewModel.currentLocation.observeAsState()
 
     if (currentLocation.value == null) {
@@ -61,7 +63,10 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
                 shouldDialogBeDismissed.value = true
             },
             dismissButton = {
-                Button(onClick = { shouldDialogBeDismissed.value = true }
+                Button(onClick = { 
+                    shouldDialogBeDismissed.value = true
+                    viewModel.updateLocation()
+                }
                 ) {
                     Text(text = "Another Location")
                 }
@@ -104,13 +109,8 @@ fun DrawMap(currentLocation: State<LatLng?>) {
             horizontalArrangement = Arrangement.Center) {
             TextField(
                 value = locationName.value,
-
                 onValueChange = { locationName.value = it },
                 placeholder = { Text(text = "Enter your location to search") },
-                modifier = Modifier
-                    .padding(3.dp)
-                    .width(300.dp)
-                    .height(60.dp),
                 textStyle = androidx.compose.ui.text.TextStyle(
                     color = Color.Black,
                     fontSize = 15.sp
@@ -118,8 +118,10 @@ fun DrawMap(currentLocation: State<LatLng?>) {
                 singleLine = true,
             )
             Button(
-                onClick = {}) {
-                Text(text = "Search")
+                onClick = {
+
+                }) {
+                Icon(Icons.Filled.Search , contentDescription = "Magnifying glass")
             }
         }
         GoogleMap(
