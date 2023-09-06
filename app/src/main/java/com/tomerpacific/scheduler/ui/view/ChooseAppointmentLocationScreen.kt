@@ -13,6 +13,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -64,8 +65,11 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
             },
             dismissButton = {
                 Button(onClick = { 
-                    shouldDialogBeDismissed.value = true
-                    viewModel.updateLocation()
+                    onAlertDialogButtonClicked(
+                        viewModel,
+                        onUserChoseCurrentLocation,
+                        shouldDialogBeDismissed,
+                        false)
                 }
                 ) {
                     Text(text = "Another Location")
@@ -73,9 +77,11 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.updateLocation()
-                    shouldDialogBeDismissed.value = true
-                    onUserChoseCurrentLocation()
+                    onAlertDialogButtonClicked(
+                        viewModel,
+                        onUserChoseCurrentLocation,
+                        shouldDialogBeDismissed,
+                        true)
                 }) {
                     Text("Confirm")
                 }
@@ -137,5 +143,17 @@ fun DrawMap(currentLocation: State<LatLng?>) {
         ) {
 
         }
+    }
+}
+
+private fun onAlertDialogButtonClicked(viewModel: MainViewModel,
+                                       onUserChoseCurrentLocation: () -> Unit,
+                                       shouldDialogBeDismissed: MutableState<Boolean>,
+                                       userChoseCurrentLocation:Boolean) {
+    viewModel.updateLocation(userChoseCurrentLocation)
+    shouldDialogBeDismissed.value = true
+
+    if (userChoseCurrentLocation) {
+        onUserChoseCurrentLocation()
     }
 }
