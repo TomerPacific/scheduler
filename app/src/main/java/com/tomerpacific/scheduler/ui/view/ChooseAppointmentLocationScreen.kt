@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import com.tomerpacific.scheduler.ui.model.MapSearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +45,7 @@ fun ChooseAppointmentLocationScreen(viewModel: MainViewModel,
     if (currentLocation.value == null) {
         ShowCurrentLocationDialog(viewModel = viewModel, onUserChoseCurrentLocation)
     } else {
-        DrawMap(currentLocation = currentLocation)
+        DrawMap(viewModel, currentLocation)
     }
 
 }
@@ -96,7 +98,12 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
 }
 
 @Composable
-fun DrawMap(currentLocation: State<LatLng?>) {
+fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
+
+    val locationAutofill = remember {
+        mutableStateListOf<MapSearchResult>()
+    }
+
     val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(LatLng(
                 currentLocation.value!!.latitude,
@@ -136,6 +143,7 @@ fun DrawMap(currentLocation: State<LatLng?>) {
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(compassEnabled = true),
             onMapClick = {
+                viewModel.updateLocation(it)
                 CoroutineScope(Dispatchers.Main).launch {
                     cameraPositionState.animate(CameraUpdateFactory.newLatLng(it))
                 }
@@ -150,7 +158,7 @@ private fun onAlertDialogButtonClicked(viewModel: MainViewModel,
                                        onUserChoseCurrentLocation: () -> Unit,
                                        shouldDialogBeDismissed: MutableState<Boolean>,
                                        userChoseCurrentLocation:Boolean) {
-    viewModel.updateLocation(userChoseCurrentLocation)
+    viewModel.setCurrentUserLocation(userChoseCurrentLocation)
     shouldDialogBeDismissed.value = true
 
     if (userChoseCurrentLocation) {
