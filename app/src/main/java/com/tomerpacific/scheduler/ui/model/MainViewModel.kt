@@ -162,7 +162,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     @SuppressLint("MissingPermission")
-    fun updateLocation(shouldUpdateAppointmentLocation: Boolean) {
+    fun setCurrentUserLocation(shouldUpdateAppointmentLocation: Boolean) {
 
         if (!shouldUpdateAppointmentLocation) {
             _currentLocation.value = LatLng(32.307800, -64.750504)
@@ -188,6 +188,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
+    }
+
+    fun updateLocation(location: LatLng) {
+        _currentLocation.value = location
     }
 
 }
