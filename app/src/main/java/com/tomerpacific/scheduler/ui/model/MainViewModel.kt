@@ -2,7 +2,6 @@ package com.tomerpacific.scheduler.ui.model
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -53,8 +52,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentScheduledAppointment: MutableLiveData<AppointmentModel> = MutableLiveData()
     val currentScheduledAppointment: LiveData<AppointmentModel> = _currentScheduledAppointment
 
-    var locationText: String = ""
-    val locationAutofill = mutableStateListOf<MapSearchResult>()
+    private val _locationText: MutableLiveData<String> = MutableLiveData("")
+    val locationText: LiveData<String> = _locationText
+
+    private val _locationAutofill: MutableLiveData<MutableList<MapSearchResult>> = MutableLiveData(mutableListOf())
+    val locationAutofill = _locationAutofill
+
     private var placesClient: PlacesClient
     private var job: Job? = null
 
@@ -209,25 +212,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _currentLocation.value = location
     }
 
-    fun fetchLocations(location: String) {
+    private fun fetchLocations(location: String) {
         job?.cancel()
-        locationAutofill.clear()
+        _locationAutofill.value?.clear()
 
         job = viewModelScope.launch {
             val request = FindAutocompletePredictionsRequest
                 .builder()
                 .setQuery(location)
                 .build()
-
+            val results = mutableListOf<MapSearchResult>()
             placesClient
                 .findAutocompletePredictions(request)
                 .addOnSuccessListener { response ->
-                    locationAutofill += response.autocompletePredictions.map {
+                    results += response.autocompletePredictions.map {
                         MapSearchResult(
                             it.getFullText(null).toString(),
                             it.placeId
                         )
                     }
+                    _locationAutofill.value = results
                 }
                 .addOnFailureListener {
                     it.printStackTrace()
@@ -235,7 +239,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getCoordinatesFromLocationResult(location: MapSearchResult) {
+    private fun getCoordinatesFromLocationResult(location: MapSearchResult) {
         val placeFields = listOf(Place.Field.LAT_LNG)
         val request = FetchPlaceRequest.newInstance(location.placeId, placeFields)
         placesClient.fetchPlace(request)
@@ -247,6 +251,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .addOnFailureListener {
                 it.printStackTrace()
             }
+    }
+
+    fun handleLocationResultItemClicked(location: MapSearchResult) {
+        _locationText.value = location.address
+        _locationAutofill.value?.clear()
+        getCoordinatesFromLocationResult(location)
+    }
+
+    fun handleLocationSearchTyping(location: String) {
+        _locationText.value = location
+        fetchLocations(location)
     }
 
 }
