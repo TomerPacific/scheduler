@@ -2,6 +2,7 @@ package com.tomerpacific.scheduler.ui.model
 
 import android.annotation.SuppressLint
 import android.app.Application
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,13 +10,20 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseUser
+import com.tomerpacific.scheduler.BuildConfig
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import com.tomerpacific.scheduler.service.RemoteConfigService
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -45,8 +53,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentScheduledAppointment: MutableLiveData<AppointmentModel> = MutableLiveData()
     val currentScheduledAppointment: LiveData<AppointmentModel> = _currentScheduledAppointment
 
+    var locationText: String = ""
+    val locationAutofill = mutableStateListOf<MapSearchResult>()
+    private var placesClient: PlacesClient
+    private var job: Job? = null
+
     init {
         remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
+        Places.initialize(applicationContext.applicationContext, BuildConfig.MAPS_API_KEY)
+        placesClient = Places.createClient(applicationContext)
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -192,6 +207,46 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateLocation(location: LatLng) {
         _currentLocation.value = location
+    }
+
+    fun fetchLocations(location: String) {
+        job?.cancel()
+        locationAutofill.clear()
+
+        job = viewModelScope.launch {
+            val request = FindAutocompletePredictionsRequest
+                .builder()
+                .setQuery(location)
+                .build()
+
+            placesClient
+                .findAutocompletePredictions(request)
+                .addOnSuccessListener { response ->
+                    locationAutofill += response.autocompletePredictions.map {
+                        MapSearchResult(
+                            it.getFullText(null).toString(),
+                            it.placeId
+                        )
+                    }
+                }
+                .addOnFailureListener {
+                    it.printStackTrace()
+                }
+        }
+    }
+
+    fun getCoordinates(location: MapSearchResult) {
+        val placeFields = listOf(Place.Field.LAT_LNG)
+        val request = FetchPlaceRequest.newInstance(location.placeId, placeFields)
+        placesClient.fetchPlace(request)
+            .addOnSuccessListener {
+                if (it != null) {
+                    updateLocation(it.place.latLng!!)
+                }
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+            }
     }
 
 }
