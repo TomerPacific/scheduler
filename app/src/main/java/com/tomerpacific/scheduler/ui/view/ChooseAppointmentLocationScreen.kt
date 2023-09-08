@@ -145,7 +145,7 @@ fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
                             .clickable {
                                 viewModel.locationText = it.address
                                 viewModel.locationAutofill.clear()
-                                viewModel.getCoordinates(it)
+                                viewModel.getCoordinatesFromLocationResult(it)
                             }
                         ) {
                             Text(it.address)
