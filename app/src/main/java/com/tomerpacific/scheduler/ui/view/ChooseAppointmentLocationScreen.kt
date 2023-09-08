@@ -38,6 +38,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import com.tomerpacific.scheduler.ui.model.MapSearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,11 +48,13 @@ fun ChooseAppointmentLocationScreen(viewModel: MainViewModel,
                                     onUserChoseCurrentLocation: () -> Unit) {
     
     val currentLocation = viewModel.currentLocation.observeAsState()
+    val locationAutofill = viewModel.locationAutofill.observeAsState()
+    val locationText = viewModel.locationText.observeAsState()
 
     if (currentLocation.value == null) {
-        ShowCurrentLocationDialog(viewModel = viewModel, onUserChoseCurrentLocation)
+        ShowCurrentLocationDialog(viewModel, onUserChoseCurrentLocation)
     } else {
-        DrawMap(viewModel, currentLocation)
+        DrawMap(viewModel, currentLocation, locationAutofill, locationText)
     }
 
 }
@@ -104,7 +107,10 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
 }
 
 @Composable
-fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
+fun DrawMap(viewModel: MainViewModel,
+            currentLocation: State<LatLng?>,
+            locationAutofill: State<MutableList<MapSearchResult>?>,
+            locationText: State<String?>) {
 
     val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(LatLng(
@@ -137,30 +143,31 @@ fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
             shape = RoundedCornerShape(8.dp)
         ) {
             Column {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(viewModel.locationAutofill) {
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clickable {
-                                viewModel.locationText = it.address
-                                viewModel.locationAutofill.clear()
-                                viewModel.getCoordinatesFromLocationResult(it)
+                if (locationAutofill.value != null) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(locationAutofill.value!!) {
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable {
+                                    viewModel.handleLocationResultItemClicked(it)
+                                }
+                            ) {
+                                Text(it.address)
                             }
-                        ) {
-                            Text(it.address)
                         }
                     }
                 }
                 Spacer(Modifier.height(16.dp))
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.locationText,
-                    onValueChange = {
-                        viewModel.locationText = it
-                        viewModel.fetchLocations(it)
+                    value = if (locationText.value != null) locationText.value!! else "",
+                    onValueChange = { input: String ->
+                        viewModel.handleLocationSearchTyping(input)
                     },
-                    placeholder = { Text(text = "Enter your location to search") },
+                    placeholder = {
+                        Text("Enter your location to search")
+                    },
                     textStyle = androidx.compose.ui.text.TextStyle(
                         color = Color.Black,
                         fontSize = 15.sp
