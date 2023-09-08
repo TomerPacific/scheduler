@@ -1,24 +1,31 @@
 package com.tomerpacific.scheduler.ui.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -31,7 +38,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-import com.tomerpacific.scheduler.ui.model.MapSearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -100,46 +106,20 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
 @Composable
 fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
 
-    val locationAutofill = remember {
-        mutableStateListOf<MapSearchResult>()
-    }
-
     val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(LatLng(
                 currentLocation.value!!.latitude,
                 currentLocation.value!!.longitude),
                 16f)
-        }
-
-    val locationName = remember {
-        mutableStateOf("")
     }
 
-    Column {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(all = 3.dp),
-            horizontalArrangement = Arrangement.Center) {
-            TextField(
-                value = locationName.value,
-                onValueChange = { locationName.value = it },
-                placeholder = { Text(text = "Enter your location to search") },
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    color = Color.Black,
-                    fontSize = 15.sp
-                ),
-                singleLine = true,
-            )
-            Button(
-                onClick = {
+    LaunchedEffect(currentLocation.value) {
+        cameraPositionState.animate(CameraUpdateFactory.newLatLng(currentLocation.value!!))
+    }
 
-                }) {
-                Icon(Icons.Filled.Search , contentDescription = "Magnifying glass")
-            }
-        }
+    Box(modifier =  Modifier.fillMaxSize()) {
         GoogleMap(
             cameraPositionState = cameraPositionState,
-            modifier = Modifier.weight(1.0f),
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(compassEnabled = true),
             onMapClick = {
@@ -148,8 +128,46 @@ fun DrawMap(viewModel: MainViewModel, currentLocation: State<LatLng?>) {
                     cameraPositionState.animate(CameraUpdateFactory.newLatLng(it))
                 }
             }
+        )
+        Surface(modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(8.dp)
+            .fillMaxWidth(),
+            color = Color.White,
+            shape = RoundedCornerShape(8.dp)
         ) {
-
+            Column {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(viewModel.locationAutofill) {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clickable {
+                                viewModel.locationText = it.address
+                                viewModel.locationAutofill.clear()
+                                viewModel.getCoordinates(it)
+                            }
+                        ) {
+                            Text(it.address)
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.locationText,
+                    onValueChange = {
+                        viewModel.locationText = it
+                        viewModel.fetchLocations(it)
+                    },
+                    placeholder = { Text(text = "Enter your location to search") },
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = Color.Black,
+                        fontSize = 15.sp
+                    ),
+                    singleLine = true,
+                )
+            }
         }
     }
 }
