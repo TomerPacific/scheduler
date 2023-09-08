@@ -235,7 +235,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getCoordinates(location: MapSearchResult) {
+    fun getCoordinatesFromLocationResult(location: MapSearchResult) {
         val placeFields = listOf(Place.Field.LAT_LNG)
         val request = FetchPlaceRequest.newInstance(location.placeId, placeFields)
         placesClient.fetchPlace(request)
