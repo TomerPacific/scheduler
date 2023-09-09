@@ -210,6 +210,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateLocation(location: LatLng) {
         _currentLocation.value = location
+        _currentScheduledAppointment.value!!.appointmentPlace = "${location.latitude},${location.longitude}"
+
+        val index = _scheduledAppointments.value!!.indices.find {
+            _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
+        }
+        index?.let {
+            _scheduledAppointments.value!!.toMutableList()[it] =
+                _currentScheduledAppointment.value!!
+            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+        }
     }
 
     private fun fetchLocations(location: String) {
