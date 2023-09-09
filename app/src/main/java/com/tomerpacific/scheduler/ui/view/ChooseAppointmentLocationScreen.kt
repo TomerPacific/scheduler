@@ -4,20 +4,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -159,21 +165,33 @@ fun DrawMap(viewModel: MainViewModel,
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = if (locationText.value != null) locationText.value!! else "",
-                    onValueChange = { input: String ->
-                        viewModel.handleLocationSearchTyping(input)
-                    },
-                    placeholder = {
-                        Text("Enter your location to search")
-                    },
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        color = Color.Black,
-                        fontSize = 15.sp
-                    ),
-                    singleLine = true,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.height(IntrinsicSize.Max)) {
+                    TextField(
+                        value = if (locationText.value != null) locationText.value!! else "",
+                        onValueChange = { input: String ->
+                            viewModel.handleLocationSearchTyping(input)
+                        },
+                        placeholder = {
+                            Text("Where should the appointment be held?")
+                        },
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            color = Color.Black,
+                            fontSize = 15.sp
+                        ),
+                        singleLine = true,
+                    )
+                    Button(
+                        modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                        onClick = {
+
+                        }) {
+                        Icon(Icons.Default.AddLocation, "Add location")
+                    }
+                }
+
             }
         }
     }
