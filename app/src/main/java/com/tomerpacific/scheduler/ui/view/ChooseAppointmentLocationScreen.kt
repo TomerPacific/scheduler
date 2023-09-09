@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +42,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.model.MapSearchResult
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +60,11 @@ fun ChooseAppointmentLocationScreen(viewModel: MainViewModel,
     if (currentLocation.value == null) {
         ShowCurrentLocationDialog(viewModel, onUserChoseCurrentLocation)
     } else {
-        DrawMap(viewModel, currentLocation, locationAutofill, locationText)
+        DrawMap(viewModel,
+            currentLocation,
+            locationAutofill,
+            locationText,
+            onUserChoseCurrentLocation)
     }
 
 }
@@ -116,7 +120,8 @@ fun ShowCurrentLocationDialog(viewModel: MainViewModel, onUserChoseCurrentLocati
 fun DrawMap(viewModel: MainViewModel,
             currentLocation: State<LatLng?>,
             locationAutofill: State<MutableList<MapSearchResult>?>,
-            locationText: State<String?>) {
+            locationText: State<String?>,
+            onUserChoseCurrentLocation: () -> Unit) {
 
     val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(LatLng(
@@ -186,7 +191,7 @@ fun DrawMap(viewModel: MainViewModel,
                         .weight(1f)
                         .fillMaxHeight(),
                         onClick = {
-
+                            onUserChoseCurrentLocation()
                         }) {
                         Icon(Icons.Default.AddLocation, "Add location")
                     }
