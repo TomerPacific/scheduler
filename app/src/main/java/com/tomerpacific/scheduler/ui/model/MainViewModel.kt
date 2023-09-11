@@ -274,4 +274,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         fetchLocations(location)
     }
 
+    fun updateLocationByUserClickOnMap(location: LatLng) {
+        _locationText.value = Utils.getAddressFromLatLng(applicationContext, location)
+    }
+
 }
