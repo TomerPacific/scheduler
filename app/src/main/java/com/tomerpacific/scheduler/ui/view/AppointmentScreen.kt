@@ -208,17 +208,6 @@ fun getAppointmentPlaceText(context: Context,
     return buildAnnotatedString {
         append("Appointment Place \n")
         appendInlineContent(iconPlaceholderId, "[icon]")
-        append(getAddress(context, coordinates))
+        append(Utils.getAddressFromLocation(context, coordinates))
     }
-}
-
-fun getAddress(context: Context, coordinates: String): String {
-    if (coordinates.isEmpty()) {
-        return ""
-    }
-
-    val userLocation = Utils.convertToLatLng(coordinates)
-    val geoCoder: Geocoder = Geocoder(context)
-    val address = geoCoder.getFromLocation(userLocation.latitude, userLocation.longitude, 1)
-    return address?.get(0)?.getAddressLine(0).toString()
 }

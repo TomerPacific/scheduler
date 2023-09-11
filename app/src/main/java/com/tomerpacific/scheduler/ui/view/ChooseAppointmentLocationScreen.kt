@@ -42,7 +42,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.model.MapSearchResult
 import kotlinx.coroutines.CoroutineScope
@@ -140,6 +139,7 @@ fun DrawMap(viewModel: MainViewModel,
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(compassEnabled = true),
             onMapClick = {
+                viewModel.updateLocationByUserClickOnMap(it)
                 viewModel.updateLocation(it)
                 CoroutineScope(Dispatchers.Main).launch {
                     cameraPositionState.animate(CameraUpdateFactory.newLatLng(it))
