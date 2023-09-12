@@ -189,7 +189,8 @@ fun DrawMap(viewModel: MainViewModel,
                     Button(
                         modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .fillMaxWidth(),
                         onClick = {
                             onUserChoseCurrentLocation()
                         }) {
