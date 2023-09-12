@@ -1,5 +1,8 @@
 package com.tomerpacific.scheduler
 
+import android.content.Context
+import android.location.Geocoder
+import com.google.android.gms.maps.model.LatLng
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -47,8 +50,31 @@ object Utils {
             null -> LocalDateTime.now().dayOfWeek
             else -> day
         }
-        val today = LocalDateTime.now()
+
         return dayToCheck == DayOfWeek.SATURDAY || dayToCheck == DayOfWeek.SUNDAY
+    }
+
+    fun convertToLatLng(location: String): LatLng {
+        val latitudeAndLongitude = location.split(",")
+        return LatLng(latitudeAndLongitude[0].toDouble(), latitudeAndLongitude[1].toDouble())
+    }
+
+    fun getAddressFromLocation(context: Context, coordinates: String): String {
+        if (coordinates.isEmpty()) {
+            return ""
+        }
+
+        val userLocation = convertToLatLng(coordinates)
+        return getAddressFromLatLng(context, userLocation)
+    }
+
+    fun getAddressFromLatLng(context: Context, coordinates: LatLng): String {
+        val geoCoder = Geocoder(context)
+        val address = geoCoder.getFromLocation(
+            coordinates.latitude,
+            coordinates.longitude,
+            1)
+        return address?.get(0)?.getAddressLine(0).toString()
     }
 
 }

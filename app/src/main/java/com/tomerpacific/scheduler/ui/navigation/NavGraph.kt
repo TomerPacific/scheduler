@@ -17,19 +17,19 @@ import com.tomerpacific.scheduler.APPOINTMENT_ACTION_KET
 import com.tomerpacific.scheduler.ERROR_MESSAGE_KEY
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_ADD_APPOINTMENT
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENTS
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_APPOINTMENT_SCREEN
+import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOCATION_SCREEN
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_LOGIN
 import com.tomerpacific.scheduler.NAVIGATION_DESTINATION_SPLASH
 import com.tomerpacific.scheduler.R
-import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
 import com.tomerpacific.scheduler.ui.view.AddAppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentSetScreen
 import com.tomerpacific.scheduler.ui.view.AppointmentsScreen
+import com.tomerpacific.scheduler.ui.view.ChooseAppointmentLocationScreen
 import com.tomerpacific.scheduler.ui.view.LoginScreen
 import com.tomerpacific.scheduler.ui.view.SplashScreen
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 
 @Composable
@@ -72,8 +72,8 @@ fun NavGraph(
             }, onAppointmentCancelled = { appointmentAction, error ->
                 viewModel.updateScheduledAppointmentsForUser()
                 navController.navigate("appointment-set/${appointmentAction}/${error}")
-            }, onAppointmentClicked = { appointment ->
-                navController.navigate("appointment/${appointment}")
+            }, onAppointmentClicked = {
+                navController.navigate(NAVIGATION_DESTINATION_APPOINTMENT_SCREEN)
             })
         }
         composable(NAVIGATION_DESTINATION_ADD_APPOINTMENT) {
@@ -116,21 +116,30 @@ fun NavGraph(
                     })
             }
         }
-        composable("appointment/{appointmentModel}",
-            arguments = listOf(
-                navArgument("appointmentModel") { type = NavType.StringType })) { backStackEntry ->
-            val appointmentString = backStackEntry.arguments?.getString("appointmentModel")
-            appointmentString?.let {
-                val appointment = Json.decodeFromString<AppointmentModel>(it)
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_black),
-                        contentDescription = "Logo",
-                        contentScale = ContentScale.Inside,
-                        modifier = Modifier.matchParentSize()
-                    )
-                    AppointmentScreen(appointment = appointment)
-                }
+        composable(NAVIGATION_DESTINATION_APPOINTMENT_SCREEN) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_black),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier.matchParentSize()
+                )
+                AppointmentScreen(viewModel, onAddLocationPressed = {
+                    navController.navigate(NAVIGATION_DESTINATION_LOCATION_SCREEN)
+                })
+            }
+        }
+        composable(NAVIGATION_DESTINATION_LOCATION_SCREEN) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_black),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier.matchParentSize()
+                )
+                ChooseAppointmentLocationScreen(viewModel, onUserChoseCurrentLocation = {
+                    navController.popBackStack()
+                })
             }
         }
     }

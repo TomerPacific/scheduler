@@ -8,6 +8,9 @@ const val NAVIGATION_DESTINATION_SPLASH = "splash"
 const val NAVIGATION_DESTINATION_LOGIN = "login"
 const val NAVIGATION_DESTINATION_APPOINTMENTS = "appointments"
 const val NAVIGATION_DESTINATION_ADD_APPOINTMENT = "add-appointment"
+const val NAVIGATION_DESTINATION_APPOINTMENT_SCREEN = "appointment-screen"
+const val NAVIGATION_DESTINATION_LOCATION_SCREEN = "location"
+
 
 /*
 * Appointment Actions

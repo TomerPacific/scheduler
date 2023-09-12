@@ -23,16 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppointmentsList(viewModel: MainViewModel,
                      onAppointmentCancelled: (String?, String?) -> Unit,
-                     onAppointmentClicked: (String) -> Unit) {
+                     onAppointmentClicked: () -> Unit) {
 
-    val appointments = viewModel.appointments.observeAsState()
+    val appointments = viewModel.scheduledAppointments.observeAsState()
     val showDialog = remember { mutableStateOf(false) }
 
     if (appointments.value != null &&
@@ -58,8 +56,8 @@ fun AppointmentsList(viewModel: MainViewModel,
                     elevation = 10.dp,
                     border = BorderStroke(width = 3.dp, color = Color.Black),
                     onClick = {
-                        val appointmentString = Json.encodeToString<AppointmentModel>(appointment)
-                        onAppointmentClicked(appointmentString)
+                        viewModel.setCurrentScheduledAppointment(appointment)
+                        onAppointmentClicked()
                     }
                 ) {
                     Row(modifier = Modifier.fillMaxWidth(),

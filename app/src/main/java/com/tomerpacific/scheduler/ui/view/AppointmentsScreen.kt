@@ -20,7 +20,7 @@ fun AppointmentsScreen(viewModel: MainViewModel,
                        onUserLogout: () -> Unit,
                        onAddAppointmentClicked: () -> Unit,
                        onAppointmentCancelled: (String?, String?) -> Unit,
-                       onAppointmentClicked: (String) -> Unit) {
+                       onAppointmentClicked: () -> Unit) {
 
     viewModel.disableCircularProgressBarIndicator()
     val user = viewModel.user.observeAsState()
