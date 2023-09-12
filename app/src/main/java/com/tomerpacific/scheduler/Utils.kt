@@ -65,14 +65,15 @@ object Utils {
         }
 
         val userLocation = convertToLatLng(coordinates)
-        val geoCoder: Geocoder = Geocoder(context)
-        val address = geoCoder.getFromLocation(userLocation.latitude, userLocation.longitude, 1)
-        return address?.get(0)?.getAddressLine(0).toString()
+        return getAddressFromLatLng(context, userLocation)
     }
 
     fun getAddressFromLatLng(context: Context, coordinates: LatLng): String {
-        val geoCoder: Geocoder = Geocoder(context)
-        val address = geoCoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1)
+        val geoCoder = Geocoder(context)
+        val address = geoCoder.getFromLocation(
+            coordinates.latitude,
+            coordinates.longitude,
+            1)
         return address?.get(0)?.getAddressLine(0).toString()
     }
 
