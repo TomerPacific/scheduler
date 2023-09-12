@@ -182,11 +182,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @SuppressLint("MissingPermission")
     fun setCurrentUserLocation(shouldUpdateAppointmentLocation: Boolean) {
 
-        if (!shouldUpdateAppointmentLocation) {
-            _currentLocation.value = LatLng(32.307800, -64.750504)
-            return
-        }
-
         val fusedLocation = LocationServices.getFusedLocationProviderClient(
             applicationContext)
 
@@ -194,15 +189,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .addOnSuccessListener { location ->
                 if (location != null) {
                     _currentLocation.value = LatLng(location.latitude, location.longitude)
-                    _currentScheduledAppointment.value!!.appointmentPlace = "${location.latitude},${location.longitude}"
 
-                    val index = _scheduledAppointments.value!!.indices.find {
-                        _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
-                    }
-                    index?.let {
-                        _scheduledAppointments.value!!.toMutableList()[it] =
-                            _currentScheduledAppointment.value!!
-                        databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                    if (shouldUpdateAppointmentLocation) {
+                        _currentScheduledAppointment.value!!.appointmentPlace = "${location.latitude},${location.longitude}"
+
+                        val index = _scheduledAppointments.value!!.indices.find {
+                            _scheduledAppointments.value!![it].appointmentId == _currentScheduledAppointment.value!!.appointmentId
+                        }
+                        index?.let {
+                            _scheduledAppointments.value!!.toMutableList()[it] =
+                                _currentScheduledAppointment.value!!
+                            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                        }
                     }
                 }
             }
