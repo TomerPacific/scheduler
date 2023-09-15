@@ -2,6 +2,8 @@ package com.tomerpacific.scheduler
 
 import android.content.Context
 import android.location.Geocoder
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.toLowerCase
 import com.google.android.gms.maps.model.LatLng
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import java.time.DayOfWeek
@@ -77,4 +79,12 @@ object Utils {
         return address?.get(0)?.getAddressLine(0).toString()
     }
 
+    fun convertLocalDateTimeToDayOfWeek(date: LocalDateTime): String {
+        return "${makeStringUppercase(date.dayOfWeek.toString())}, ${makeStringUppercase(date.month.toString())} ${date.dayOfMonth}"
+    }
+
+    fun makeStringUppercase(str: String): String {
+        val s = str.lowercase()
+        return s.replaceFirstChar { it.titlecase() }
+    }
 }
