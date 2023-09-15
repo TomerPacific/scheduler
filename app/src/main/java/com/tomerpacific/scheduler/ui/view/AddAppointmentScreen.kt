@@ -44,7 +44,7 @@ fun AddAppointmentScreen(viewModel: MainViewModel, onAppointmentScheduled: (Stri
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp)) {
-                    Text(text = "Schedule An Appointment",
+                    Text(text = "Schedule An Appointment For ${Utils.convertLocalDateTimeToDayOfWeek(currentDate)}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp,
                         textAlign = TextAlign.Center)
