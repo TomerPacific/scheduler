@@ -77,4 +77,14 @@ object Utils {
         return address?.get(0)?.getAddressLine(0).toString()
     }
 
+    fun convertLocalDateTimeToDayOfWeek(date: LocalDateTime): String {
+        return "${makeStringUppercase(date.dayOfWeek.toString())}, " +
+                "${makeStringUppercase(date.month.toString())} " +
+                "${date.dayOfMonth}"
+    }
+
+    fun makeStringUppercase(str: String): String {
+        val lowercaseWord = str.lowercase()
+        return lowercaseWord.replaceFirstChar { it.titlecase() }
+    }
 }
