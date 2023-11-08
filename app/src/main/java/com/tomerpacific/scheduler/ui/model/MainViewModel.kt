@@ -22,9 +22,10 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import com.tomerpacific.scheduler.service.RemoteConfigService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -73,12 +74,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun signupUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
-        viewModelScope.launch {
-            coroutineScope {
-                launch {
-                    _user.value = authService.signupUser(email, password)
-                    onNavigateAfterLoginScreen()
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            _user.value = authService.signupUser(email, password)
+            withContext(Dispatchers.Main) {
+                onNavigateAfterLoginScreen()
             }
 
         }
@@ -86,16 +85,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loginUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
-        viewModelScope.launch {
-            coroutineScope {
-                launch {
-                    _user.value = authService.logInUser(email, password)
-                    onNavigateAfterLoginScreen()
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            _user.value = authService.logInUser(email, password)
+            withContext(Dispatchers.Main) {
+                onNavigateAfterLoginScreen()
             }
-
         }
     }
+
 
     private fun isUserConnected(): Boolean {
         return authService.isUserCurrentlySignedIn()
