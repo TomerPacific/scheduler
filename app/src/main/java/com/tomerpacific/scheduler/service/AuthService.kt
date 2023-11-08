@@ -18,13 +18,13 @@ class AuthService(remoteConfigurationService: RemoteConfigService) {
     }
 
     suspend fun signupUser(email: String, password: String) =
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             result.user
         }
 
     suspend fun logInUser(email: String, password: String) =
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             result.user
         }
