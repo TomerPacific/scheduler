@@ -14,6 +14,11 @@ import com.tomerpacific.scheduler.REMOTE_CONFIG_THURSDAY_KEY
 import com.tomerpacific.scheduler.REMOTE_CONFIG_TUESDAY_KEY
 import com.tomerpacific.scheduler.REMOTE_CONFIG_WEDNESDAY_KEY
 import com.tomerpacific.scheduler.START_HOUR_FOR_APPOINTMENTS
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 
@@ -33,23 +38,30 @@ class RemoteConfigService {
     }
 
     fun fetchAndActivate(onRemoteConfigurationActivatedSuccess: () -> Unit, onRemoteConfigurationActivatedFailure: (String) -> Unit) {
-        remoteConfig.fetchAndActivate()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val appointmentStartAndEndTimesFromConfig = remoteConfig.getString(REMOTE_CONFIG_APPOINTMENT_HOURS_KEY)
-                    appointmentStartAndEndTimes = Json.decodeFromString(
-                        AppointmentStartAndEndTimesModel.serializer(),
-                        appointmentStartAndEndTimesFromConfig)
-                    adminUserEmail = remoteConfig.getString(REMOTE_CONFIG_ADMIN_EMAIL_KEY)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val remoteConfigActivation = remoteConfig.fetchAndActivate()
+            val didFetchAndActivate = remoteConfigActivation.await()
+
+            if (didFetchAndActivate) {
+                val appointmentStartAndEndTimesFromConfig = remoteConfig.getString(REMOTE_CONFIG_APPOINTMENT_HOURS_KEY)
+                appointmentStartAndEndTimes = Json.decodeFromString(
+                    AppointmentStartAndEndTimesModel.serializer(),
+                    appointmentStartAndEndTimesFromConfig)
+                adminUserEmail = remoteConfig.getString(REMOTE_CONFIG_ADMIN_EMAIL_KEY)
+                withContext(Dispatchers.Main) {
                     onRemoteConfigurationActivatedSuccess()
                 }
-            }.addOnFailureListener { error ->
-                print(error.localizedMessage)
-                error.localizedMessage?.let {
-                    onRemoteConfigurationActivatedFailure(it)
-                }
 
+            } else {
+                remoteConfigActivation.exception?.localizedMessage?.let { errorMsg ->
+                    withContext(Dispatchers.Main) {
+                        onRemoteConfigurationActivatedFailure(errorMsg)
+                    }
+
+                }
             }
+        }
     }
 
     fun getAppointmentStartAndEndTimeByDay(currentDate: LocalDateTime): List<Int> {
