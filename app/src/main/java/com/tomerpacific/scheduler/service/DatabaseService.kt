@@ -151,45 +151,45 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     }
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
-
-        database.child(DATES_KEY)
-            .endAt(Date().time.toString())
-            .get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, String>>>()
-                    if (scheduledAppointments != null) {
-                        for (date in scheduledAppointments.keys) {
-                            scheduledAppointments[date]?.clear()
-                        }
-                        database.child(DATES_KEY).setValue(scheduledAppointments)
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(DATES_KEY)
+                .endAt(Date().time.toString())
+                .get()
+            if (result.isSuccessful) {
+                val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, String>>>()
+                if (scheduledAppointments != null) {
+                    for (date in scheduledAppointments.keys) {
+                        scheduledAppointments[date]?.clear()
                     }
+                    database.child(DATES_KEY).setValue(scheduledAppointments)
                 }
-            }.addOnFailureListener {
-
-            }
-        database.child(APPOINTMENTS_KEY).child(user.uid).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, AppointmentModel>>()
-                    if (scheduledAppointments != null) {
-                        for (appointment in pastAppointments) {
-                            if (scheduledAppointments.containsKey(appointment.appointmentId)) {
-                                scheduledAppointments.remove(appointment.appointmentId)
-                            }
-                        }
-                    }
-                    database.child(APPOINTMENTS_KEY)
-                        .child(user.uid)
-                        .setValue(scheduledAppointments)
-                        .addOnCompleteListener {
-
-                        }
-                        .addOnFailureListener {
-
-                        }
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
                 }
             }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(APPOINTMENTS_KEY).child(user.uid).get()
+            if (result.isSuccessful) {
+                val scheduledAppointments =
+                    result.result.getValue<HashMap<String, AppointmentModel>>()
+                if (scheduledAppointments != null) {
+                    for (appointment in pastAppointments) {
+                        if (scheduledAppointments.containsKey(appointment.appointmentId)) {
+                            scheduledAppointments.remove(appointment.appointmentId)
+                        }
+                    }
+                }
+                database.child(APPOINTMENTS_KEY)
+                    .child(user.uid)
+                    .setValue(scheduledAppointments)
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
+                }
+            }
+        }
     }
 
     fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
