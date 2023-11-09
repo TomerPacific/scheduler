@@ -169,6 +169,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                 }
             }
         }
+
         CoroutineScope(Dispatchers.IO).launch {
             val result = database.child(APPOINTMENTS_KEY).child(user.uid).get()
             if (result.isSuccessful) {
@@ -193,24 +194,23 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     }
 
     fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
-        database.child(APPOINTMENTS_KEY).child(user.uid).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, AppointmentModel>>()
-                    if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentId)) {
-                        scheduledAppointments[appointment.appointmentId] = appointment
-                    }
-                    database.child(APPOINTMENTS_KEY)
-                        .child(user.uid)
-                        .setValue(scheduledAppointments)
-                        .addOnCompleteListener {
-
-                        }
-                        .addOnFailureListener {
-
-                        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(APPOINTMENTS_KEY).child(user.uid).get()
+            if (result.isSuccessful) {
+                val scheduledAppointments =
+                    result.result.getValue<HashMap<String, AppointmentModel>>()
+                if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentId)) {
+                    scheduledAppointments[appointment.appointmentId] = appointment
+                }
+                database.child(APPOINTMENTS_KEY)
+                    .child(user.uid)
+                    .setValue(scheduledAppointments)
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
                 }
             }
+        }
     }
 
     @OptIn(ExperimentalTime::class)
