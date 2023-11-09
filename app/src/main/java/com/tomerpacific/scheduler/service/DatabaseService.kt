@@ -7,6 +7,10 @@ import com.google.firebase.ktx.Firebase
 import com.tomerpacific.scheduler.*
 import com.tomerpacific.scheduler.ui.model.AppointmentModel
 import com.tomerpacific.scheduler.ui.model.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -23,51 +27,57 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     fun setAppointment(appointment: AppointmentModel,
                        onAppointmentScheduled: (String?, String?) -> Unit) {
-        database.child(DATES_KEY)
-            .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    var data = result.result.getValue<HashMap<String, String>>()
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(DATES_KEY)
+                .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
+            if (result.isSuccessful) {
+                var data = result.result.getValue<HashMap<String, String>>()
 
-                    if (data == null) {
-                        data =  hashMapOf()
-                    }
-
-                    data[appointment.appointmentDate.toString()] = appointment.userId!!
-
-                    database.child(DATES_KEY)
-                        .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate))
-                        .setValue(data)
+                if (data == null) {
+                    data =  hashMapOf()
                 }
-            }
-            .addOnFailureListener { error ->
-                onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, error.message)
-            }
-        database.child(APPOINTMENTS_KEY).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
 
-                    val appointments = when(val data: HashMap<String, HashMap<String, AppointmentModel>>? = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()) {
-                        null -> HashMap()
-                        else -> data
-                    }
+                data[appointment.appointmentDate.toString()] = appointment.userId!!
 
-                    val scheduledAppointments = appointments[appointment.userId!!]
-                    val aps = when (scheduledAppointments.isNullOrEmpty()) {
-                        true -> hashMapOf<String, AppointmentModel>()
-                        false -> scheduledAppointments
-                    }
-
-                    aps[appointment.appointmentId] = appointment
-                    appointments[appointment.userId!!] = aps
-                    database.child(APPOINTMENTS_KEY).setValue(appointments).addOnCompleteListener {
-                        onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
+                database.child(DATES_KEY)
+                    .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate))
+                    .setValue(data)
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    withContext(Dispatchers.Main) {
+                        onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, errorMsg)
                     }
                 }
             }
-            .addOnFailureListener { error ->
-                onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, error.message)
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(APPOINTMENTS_KEY).get()
+            if (result.isSuccessful) {
+                val appointments = when(val data: HashMap<String, HashMap<String, AppointmentModel>>? = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()) {
+                    null -> HashMap()
+                    else -> data
+                }
+
+                val scheduledAppointments = appointments[appointment.userId!!]
+                val aps = when (scheduledAppointments.isNullOrEmpty()) {
+                    true -> hashMapOf<String, AppointmentModel>()
+                    false -> scheduledAppointments
+                }
+
+                aps[appointment.appointmentId] = appointment
+                appointments[appointment.userId!!] = aps
+                database.child(APPOINTMENTS_KEY).setValue(appointments).addOnCompleteListener {
+                    onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
+                }
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    withContext(Dispatchers.Main) {
+                        onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, errorMsg)
+                    }
+                }
             }
+        }
     }
 
     fun cancelAppointment(appointment: AppointmentModel,
