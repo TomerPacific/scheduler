@@ -253,24 +253,24 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel, isAdmin: Boolean) {
 
-        database.child(APPOINTMENTS_KEY).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
-                    if (scheduledAppointments != null) {
-                        when (isAdmin) {
-                            true -> collectScheduledAppointmentsForAdminUser(scheduledAppointments, viewModel)
-                            false -> collectScheduledAppointmentsForRegularUser(
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = database.child(APPOINTMENTS_KEY).get()
+            if (result.isSuccessful) {
+                val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
+                if (scheduledAppointments != null) {
+                    when (isAdmin) {
+                        true -> collectScheduledAppointmentsForAdminUser(scheduledAppointments, viewModel)
+                        false -> collectScheduledAppointmentsForRegularUser(
                             scheduledAppointments,
                             user,
                             viewModel)
-                        }
-                    } else {
-                        viewModel.setScheduledAppointments(scheduledAppointments = listOf())
                     }
+                } else {
+                    viewModel.setScheduledAppointments(scheduledAppointments = listOf())
                 }
             }
         }
+    }
 
     private fun collectScheduledAppointmentsForAdminUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
                                                          viewModel: MainViewModel) {
