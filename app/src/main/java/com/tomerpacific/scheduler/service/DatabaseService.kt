@@ -1,5 +1,6 @@
 package com.tomerpacific.scheduler.service
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
@@ -24,6 +25,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     private val remoteConfigService = _remoteConfigService
     private val APPOINTMENTS_KEY = "appointments"
     private val DATES_KEY = "dates"
+    private val TAG = DatabaseService::class.java.simpleName
 
     fun setAppointment(appointment: AppointmentModel,
                        onAppointmentScheduled: (String?, String?) -> Unit) {
@@ -82,38 +84,44 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
-        database.child(DATES_KEY)
-            .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = result.result.getValue<HashMap<String, String>>()
-                    if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentDate.toString())) {
-                            scheduledAppointments.remove(appointment.appointmentDate.toString())
-                    }
-                    database.child(DATES_KEY)
-                        .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
-                        .addOnCompleteListener {
-
-                        }.addOnFailureListener {
-
-                    }
+        CoroutineScope(Dispatchers.IO).launch {
+            val result =  database.child(DATES_KEY)
+                .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
+            if (result.isSuccessful) {
+                val scheduledAppointments = result.result.getValue<HashMap<String, String>>()
+                if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentDate.toString())) {
+                    scheduledAppointments.remove(appointment.appointmentDate.toString())
+                }
+                database.child(DATES_KEY)
+                    .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
                 }
             }
-        database.child(APPOINTMENTS_KEY).child(appointment.userId!!).get()
-            .addOnCompleteListener { result ->
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val userScheduledAppointmentsSnapshot = database.child(APPOINTMENTS_KEY).child(appointment.userId!!).get()
+            if (userScheduledAppointmentsSnapshot.isSuccessful) {
+                val userScheduledAppointments = userScheduledAppointmentsSnapshot.result.getValue<HashMap<String, AppointmentModel>>()
+                if (userScheduledAppointments != null && userScheduledAppointments.containsKey(appointment.appointmentId)) {
+                    userScheduledAppointments.remove(appointment.appointmentId)
+                }
+                val result = database.child(APPOINTMENTS_KEY)
+                    .child(appointment.userId!!)
+                    .setValue(userScheduledAppointments)
                 if (result.isSuccessful) {
-                    val userScheduledAppointments = result.result.getValue<HashMap<String, AppointmentModel>>()
-                    if (userScheduledAppointments != null && userScheduledAppointments.containsKey(appointment.appointmentId)) {
-                        userScheduledAppointments.remove(appointment.appointmentId)
-                        database.child(APPOINTMENTS_KEY)
-                            .child(appointment.userId!!)
-                            .setValue(userScheduledAppointments)
-                            .addOnCompleteListener {
-                                onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
-                            }
+                    withContext(Dispatchers.Main) {
+                        onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
                     }
                 }
+            } else {
+                userScheduledAppointmentsSnapshot.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
+                }
             }
+        }
     }
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
