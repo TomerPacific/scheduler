@@ -126,27 +126,28 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
         val timestamp = date.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()
-        database.child(DATES_KEY)
-            .child(Utils.convertTimestampToDayAndMonth(timestamp)).get()
-            .addOnCompleteListener { result ->
-                if (result.isSuccessful) {
-                    val scheduledAppointments = mutableListOf<Long>()
-                    val appointmentDates = result.result.getValue<HashMap<String, String>>()
-                    if (appointmentDates != null) {
 
-                        for (appointmentTime in appointmentDates.keys) {
-                            scheduledAppointments.add(appointmentTime.toLong())
-                        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val result =  database.child(DATES_KEY)
+                .child(Utils.convertTimestampToDayAndMonth(timestamp)).get()
+            if (result.isSuccessful) {
+                val scheduledAppointments = mutableListOf<Long>()
+                val appointmentDates = result.result.getValue<HashMap<String, String>>()
+                if (appointmentDates != null) {
+
+                    for (appointmentTime in appointmentDates.keys) {
+                        scheduledAppointments.add(appointmentTime.toLong())
                     }
+                }
 
-                    val availableAppointments = createAppointmentsForDay(scheduledAppointments, date)
-                    viewModel.setAvailableAppointments(availableAppointments)
+                val availableAppointments = createAppointmentsForDay(scheduledAppointments, date)
+                viewModel.setAvailableAppointments(availableAppointments)
+            } else {
+                result.exception?.localizedMessage?.let { errorMsg ->
+                    Log.d(TAG, errorMsg)
                 }
             }
-            .addOnFailureListener { error ->
-                print(error.localizedMessage)
-            }
-
+        }
     }
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
