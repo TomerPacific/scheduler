@@ -29,21 +29,16 @@ class RemoteConfigService {
     private lateinit var adminUserEmail: String
 
     init {
-        val remoteConfigSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 2000
-        }
-
-        remoteConfig.setConfigSettingsAsync(remoteConfigSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
     }
 
-    fun fetchAndActivate(onRemoteConfigurationActivatedSuccess: () -> Unit, onRemoteConfigurationActivatedFailure: (String) -> Unit) {
+    suspend fun fetchAndActivate(onRemoteConfigurationActivatedSuccess: () -> Unit, onRemoteConfigurationActivatedFailure: (String) -> Unit) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val remoteConfigActivation = remoteConfig.fetchAndActivate()
             val didFetchAndActivate = remoteConfigActivation.await()
 
-            if (didFetchAndActivate) {
+            if (didFetchAndActivate || remoteConfigActivation.isSuccessful) {
                 val appointmentStartAndEndTimesFromConfig = remoteConfig.getString(REMOTE_CONFIG_APPOINTMENT_HOURS_KEY)
                 appointmentStartAndEndTimes = Json.decodeFromString(
                     AppointmentStartAndEndTimesModel.serializer(),
@@ -52,7 +47,6 @@ class RemoteConfigService {
                 withContext(Dispatchers.Main) {
                     onRemoteConfigurationActivatedSuccess()
                 }
-
             } else {
                 remoteConfigActivation.exception?.localizedMessage?.let { errorMsg ->
                     withContext(Dispatchers.Main) {
