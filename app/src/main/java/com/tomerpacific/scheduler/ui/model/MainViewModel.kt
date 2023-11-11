@@ -75,8 +75,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun signupUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            _user.value = authService.signupUser(email, password)
+            val signedUpUser = authService.signupUser(email, password)
             withContext(Dispatchers.Main) {
+                _user.value = signedUpUser
                 onNavigateAfterLoginScreen()
             }
 
@@ -86,8 +87,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loginUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            _user.value = authService.logInUser(email, password)
+            val loggedInUser = authService.logInUser(email, password)
             withContext(Dispatchers.Main) {
+                _user.value = loggedInUser
                 onNavigateAfterLoginScreen()
             }
         }
