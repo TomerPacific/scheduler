@@ -59,13 +59,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _locationAutofill: MutableLiveData<MutableList<MapSearchResult>> = MutableLiveData(mutableListOf())
     val locationAutofill = _locationAutofill
 
-    private var placesClient: PlacesClient
+    private lateinit var placesClient: PlacesClient
     private var job: Job? = null
 
     init {
-        remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
-        Places.initialize(applicationContext.applicationContext, BuildConfig.MAPS_API_KEY)
-        placesClient = Places.createClient(applicationContext)
+        viewModelScope.launch {
+            remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
+            Places.initialize(applicationContext.applicationContext, BuildConfig.MAPS_API_KEY)
+            _user.value = authService.getCurrentlySignedInUser()
+            placesClient = Places.createClient(applicationContext)
+        }
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
