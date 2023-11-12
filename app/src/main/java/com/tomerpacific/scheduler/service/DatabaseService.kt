@@ -64,8 +64,10 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
             aps[appointment.appointmentId] = appointment
             appointments[appointment.userId!!] = aps
-            database.child(APPOINTMENTS_KEY).setValue(appointments).addOnCompleteListener {
-                onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
+            database.child(APPOINTMENTS_KEY).setValue(appointments).await().apply {
+                withContext(Dispatchers.Main) {
+                    onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
+                    }
                 }
             }
     }
@@ -73,43 +75,35 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result =  database.child(DATES_KEY)
-                .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
-            if (result.isSuccessful) {
-                val scheduledAppointments = result.result.getValue<HashMap<String, String>>()
+            val dataSnapshot =  database.child(DATES_KEY)
+                .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get().await()
+                val scheduledAppointments = dataSnapshot.getValue<HashMap<String, String>>()
                 if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentDate.toString())) {
                     scheduledAppointments.remove(appointment.appointmentDate.toString())
                 }
                 database.child(DATES_KEY)
                     .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
-            } else {
-                result.exception?.localizedMessage?.let { errorMsg ->
-                    Log.d(TAG, errorMsg)
-                }
             }
-        }
 
         CoroutineScope(Dispatchers.IO).launch {
-            val userScheduledAppointmentsSnapshot = database.child(APPOINTMENTS_KEY).child(appointment.userId!!).get()
-            if (userScheduledAppointmentsSnapshot.isSuccessful) {
-                val userScheduledAppointments = userScheduledAppointmentsSnapshot.result.getValue<HashMap<String, AppointmentModel>>()
+            val userScheduledAppointmentsSnapshot = database.child(APPOINTMENTS_KEY)
+                .child(appointment.userId!!)
+                .get()
+                .await()
+
+                val userScheduledAppointments = userScheduledAppointmentsSnapshot.getValue<HashMap<String, AppointmentModel>>()
                 if (userScheduledAppointments != null && userScheduledAppointments.containsKey(appointment.appointmentId)) {
                     userScheduledAppointments.remove(appointment.appointmentId)
                 }
-                val result = database.child(APPOINTMENTS_KEY)
+
+                database.child(APPOINTMENTS_KEY)
                     .child(appointment.userId!!)
-                    .setValue(userScheduledAppointments)
-                if (result.isSuccessful) {
-                    withContext(Dispatchers.Main) {
-                        onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
-                    }
-                }
-            } else {
-                userScheduledAppointmentsSnapshot.exception?.localizedMessage?.let { errorMsg ->
-                    Log.d(TAG, errorMsg)
+                    .setValue(userScheduledAppointments).await()
+
+                withContext(Dispatchers.Main) {
+                    onAppointmentCancelled(APPOINTMENT_ACTION_CANCEL, null)
                 }
             }
-        }
     }
 
     fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
@@ -135,64 +129,46 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
     private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result = database.child(DATES_KEY)
-                .endAt(Date().time.toString())
-                .get()
-            if (result.isSuccessful) {
-                val scheduledAppointments = result.result.getValue<HashMap<String, HashMap<String, String>>>()
-                if (scheduledAppointments != null) {
-                    for (date in scheduledAppointments.keys) {
-                        scheduledAppointments[date]?.clear()
-                    }
-                    database.child(DATES_KEY).setValue(scheduledAppointments)
+            val dataSnapshot = database.child(DATES_KEY)
+            .endAt(Date().time.toString())
+            .get().await()
+            val scheduledAppointments = dataSnapshot.getValue<HashMap<String, HashMap<String, String>>>()
+            if (scheduledAppointments != null) {
+                for (date in scheduledAppointments.keys) {
+                    scheduledAppointments[date]?.clear()
                 }
-            } else {
-                result.exception?.localizedMessage?.let { errorMsg ->
-                    Log.d(TAG, errorMsg)
-                }
+                database.child(DATES_KEY).setValue(scheduledAppointments)
             }
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            val result = database.child(APPOINTMENTS_KEY).child(user.uid).get()
-            if (result.isSuccessful) {
-                val scheduledAppointments =
-                    result.result.getValue<HashMap<String, AppointmentModel>>()
-                if (scheduledAppointments != null) {
-                    for (appointment in pastAppointments) {
-                        if (scheduledAppointments.containsKey(appointment.appointmentId)) {
-                            scheduledAppointments.remove(appointment.appointmentId)
-                        }
+            val dataSnapshot = database.child(APPOINTMENTS_KEY).child(user.uid).get().await()
+            val scheduledAppointments =
+                dataSnapshot.getValue<HashMap<String, AppointmentModel>>()
+            if (scheduledAppointments != null) {
+                for (appointment in pastAppointments) {
+                    if (scheduledAppointments.containsKey(appointment.appointmentId)) {
+                        scheduledAppointments.remove(appointment.appointmentId)
                     }
                 }
-                database.child(APPOINTMENTS_KEY)
-                    .child(user.uid)
-                    .setValue(scheduledAppointments)
-            } else {
-                result.exception?.localizedMessage?.let { errorMsg ->
-                    Log.d(TAG, errorMsg)
-                }
             }
+            database.child(APPOINTMENTS_KEY)
+                .child(user.uid)
+                .setValue(scheduledAppointments)
         }
     }
 
     fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result = database.child(APPOINTMENTS_KEY).child(user.uid).get()
-            if (result.isSuccessful) {
-                val scheduledAppointments =
-                    result.result.getValue<HashMap<String, AppointmentModel>>()
-                if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentId)) {
-                    scheduledAppointments[appointment.appointmentId] = appointment
-                }
-                database.child(APPOINTMENTS_KEY)
-                    .child(user.uid)
-                    .setValue(scheduledAppointments)
-            } else {
-                result.exception?.localizedMessage?.let { errorMsg ->
-                    Log.d(TAG, errorMsg)
-                }
+            val dataSnapshot = database.child(APPOINTMENTS_KEY).child(user.uid).get().await()
+            val scheduledAppointments =
+                dataSnapshot.getValue<HashMap<String, AppointmentModel>>()
+            if (scheduledAppointments != null && scheduledAppointments.containsKey(appointment.appointmentId)) {
+                scheduledAppointments[appointment.appointmentId] = appointment
             }
+            database.child(APPOINTMENTS_KEY)
+                .child(user.uid)
+                .setValue(scheduledAppointments)
         }
     }
 
