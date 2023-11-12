@@ -131,11 +131,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
-        _availableAppointments.value = appointments
+        viewModelScope.launch {
+            _availableAppointments.value = appointments
+        }
+
     }
 
     fun setScheduledAppointments(scheduledAppointments: List<AppointmentModel>) {
-        _scheduledAppointments.value = scheduledAppointments
+        viewModelScope.launch {
+            _scheduledAppointments.value = scheduledAppointments
+        }
     }
 
     fun updateScheduledAppointmentsForUser() {
