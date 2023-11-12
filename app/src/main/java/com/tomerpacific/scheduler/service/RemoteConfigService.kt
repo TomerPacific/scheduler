@@ -2,7 +2,6 @@ package com.tomerpacific.scheduler.service
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.tomerpacific.scheduler.END_HOUR_FOR_APPOINTMENTS
 import com.tomerpacific.scheduler.ui.model.AppointmentStartAndEndTimesModel
 import com.tomerpacific.scheduler.R
