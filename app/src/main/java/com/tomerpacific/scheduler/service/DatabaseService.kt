@@ -1,6 +1,5 @@
 package com.tomerpacific.scheduler.service
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
@@ -26,7 +25,6 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     private val remoteConfigService = _remoteConfigService
     private val APPOINTMENTS_KEY = "appointments"
     private val DATES_KEY = "dates"
-    private val TAG = DatabaseService::class.java.simpleName
 
     fun setAppointment(appointment: AppointmentModel,
                        onAppointmentScheduled: (String?, String?) -> Unit) {
@@ -223,6 +221,8 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                         user,
                         viewModel)
                 }
+            } else {
+                viewModel.setScheduledAppointments(listOf())
             }
         }
     }
