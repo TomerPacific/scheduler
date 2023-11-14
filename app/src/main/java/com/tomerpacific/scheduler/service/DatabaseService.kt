@@ -26,9 +26,9 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
     private val APPOINTMENTS_KEY = "appointments"
     private val DATES_KEY = "dates"
 
-    fun setAppointment(appointment: AppointmentModel,
+    suspend fun setAppointment(appointment: AppointmentModel,
                        onAppointmentScheduled: (String?, String?) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(DATES_KEY)
                 .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get()
                 .await()
@@ -45,7 +45,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                 .setValue(data)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(APPOINTMENTS_KEY).get().await()
             val allAppointments =
                 when (val data: HashMap<String, HashMap<String, AppointmentModel>>? =

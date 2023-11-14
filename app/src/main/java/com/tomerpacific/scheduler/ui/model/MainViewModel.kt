@@ -22,6 +22,7 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import com.tomerpacific.scheduler.service.RemoteConfigService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -127,7 +128,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?, String?) -> Unit) {
         appointment.userId = _user.value!!.uid
-        databaseService.setAppointment(appointment, onAppointmentScheduled)
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseService.setAppointment(appointment, onAppointmentScheduled)
+        }
     }
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
