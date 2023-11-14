@@ -248,15 +248,17 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         val pastAppointments = mutableListOf<AppointmentModel>()
         val userAppointments = scheduledAppointments[user.uid]
         val appointments = mutableListOf<AppointmentModel>()
-        if (userAppointments != null) {
-            for (userAppointment in userAppointments.keys) {
-                val appointment = userAppointments[userAppointment]!!
-                if (!Utils.isAppointmentDatePassed(appointment)) {
-                    appointments.add(appointment)
-                } else {
-                    pastAppointments.add(appointment)
+
+        userAppointments?.let {
+            for (userAppointment in it.keys) {
+                val appointment = it[userAppointment]!!
+
+                when (Utils.isAppointmentDatePassed(appointment)) {
+                    true -> pastAppointments.add(appointment)
+                    false -> appointments.add(appointment)
                 }
             }
+
             viewModel.setScheduledAppointments(scheduledAppointments = appointments)
             if (pastAppointments.isNotEmpty()) {
                 removePastAppointmentsForUser(user, pastAppointments)
