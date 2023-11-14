@@ -47,22 +47,22 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val dataSnapshot = database.child(APPOINTMENTS_KEY).get().await()
-            val appointments =
+            val allAppointments =
                 when (val data: HashMap<String, HashMap<String, AppointmentModel>>? =
                     dataSnapshot.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()) {
                     null -> HashMap()
                     else -> data
                 }
 
-            val scheduledAppointments = appointments[appointment.userId!!]
-            val aps = when (scheduledAppointments.isNullOrEmpty()) {
+            val scheduledAppointmentsForUser = allAppointments[appointment.userId!!]
+            val appointments = when (scheduledAppointmentsForUser.isNullOrEmpty()) {
                 true -> hashMapOf<String, AppointmentModel>()
-                false -> scheduledAppointments
+                false -> scheduledAppointmentsForUser
             }
 
-            aps[appointment.appointmentId] = appointment
-            appointments[appointment.userId!!] = aps
-            database.child(APPOINTMENTS_KEY).setValue(appointments).await().apply {
+            appointments[appointment.appointmentId] = appointment
+            allAppointments[appointment.userId!!] = appointments
+            database.child(APPOINTMENTS_KEY).setValue(allAppointments).await().apply {
                 withContext(Dispatchers.Main) {
                     onAppointmentScheduled(APPOINTMENT_ACTION_SCHEDULE, null)
                     }
