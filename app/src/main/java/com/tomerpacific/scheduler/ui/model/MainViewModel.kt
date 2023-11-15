@@ -22,9 +22,11 @@ import com.tomerpacific.scheduler.Utils
 import com.tomerpacific.scheduler.service.AuthService
 import com.tomerpacific.scheduler.service.DatabaseService
 import com.tomerpacific.scheduler.service.RemoteConfigService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -58,13 +60,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _locationAutofill: MutableLiveData<MutableList<MapSearchResult>> = MutableLiveData(mutableListOf())
     val locationAutofill = _locationAutofill
 
-    private var placesClient: PlacesClient
+    private lateinit var placesClient: PlacesClient
     private var job: Job? = null
 
     init {
-        remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
-        Places.initialize(applicationContext.applicationContext, BuildConfig.MAPS_API_KEY)
-        placesClient = Places.createClient(applicationContext)
+        viewModelScope.launch {
+            remoteConfigService.fetchAndActivate(::remoteConfigurationActivatedSuccess, ::remoteConfigurationActivatedFailure)
+            Places.initialize(applicationContext.applicationContext, BuildConfig.MAPS_API_KEY)
+            _user.value = authService.getCurrentlySignedInUser()
+            placesClient = Places.createClient(applicationContext)
+        }
     }
 
     fun isUserInputValid(email: String, password: String): Boolean {
@@ -73,12 +78,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun signupUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
-        viewModelScope.launch {
-            coroutineScope {
-                launch {
-                    _user.value = authService.signupUser(email, password)
-                    onNavigateAfterLoginScreen()
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            val signedUpUser = authService.signupUser(email, password)
+            withContext(Dispatchers.Main) {
+                _user.value = signedUpUser
+                onNavigateAfterLoginScreen()
             }
 
         }
@@ -86,16 +90,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loginUser(email: String, password: String, onNavigateAfterLoginScreen: () -> Unit) {
         _shouldDisplayCircularProgressBar.value = true
-        viewModelScope.launch {
-            coroutineScope {
-                launch {
-                    _user.value = authService.logInUser(email, password)
-                    onNavigateAfterLoginScreen()
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            val loggedInUser = authService.logInUser(email, password)
+            withContext(Dispatchers.Main) {
+                _user.value = loggedInUser
+                onNavigateAfterLoginScreen()
             }
-
         }
     }
+
 
     private fun isUserConnected(): Boolean {
         return authService.isUserCurrentlySignedIn()
@@ -125,24 +128,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?, String?) -> Unit) {
         appointment.userId = _user.value!!.uid
-        databaseService.setAppointment(appointment, onAppointmentScheduled)
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.setAppointment(appointment, onAppointmentScheduled)
+        }
     }
 
     fun setAvailableAppointments(appointments: List<AppointmentModel>) {
-        _availableAppointments.value = appointments
+        viewModelScope.launch {
+            _availableAppointments.value = appointments
+        }
+
     }
 
     fun setScheduledAppointments(scheduledAppointments: List<AppointmentModel>) {
-        _scheduledAppointments.value = scheduledAppointments
+        viewModelScope.launch {
+            _scheduledAppointments.value = scheduledAppointments
+        }
     }
 
     fun updateScheduledAppointmentsForUser() {
-        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+        }
     }
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
                                           onAppointmentCancelled: (String?, String?) -> Unit) {
-        databaseService.cancelAppointment(appointment, onAppointmentCancelled)
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.cancelAppointment(appointment, onAppointmentCancelled)
+        }
     }
 
     fun getAppointmentsForDay(date: LocalDateTime) {
@@ -150,20 +164,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             setAvailableAppointments(listOf())
             return
         }
-        databaseService.getAvailableAppointmentsForDate(this, date)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.getAvailableAppointmentsForDate(this@MainViewModel, date)
+        }
     }
 
     private fun remoteConfigurationActivatedSuccess() {
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+            }
         }
     }
 
     private fun remoteConfigurationActivatedFailure(errorMsg: String) {
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+            }
+
         }
     }
 
@@ -199,7 +221,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         index?.let {
                             _scheduledAppointments.value!!.toMutableList()[it] =
                                 _currentScheduledAppointment.value!!
-                            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                            viewModelScope.launch(Dispatchers.IO) {
+                                databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                            }
                         }
                     }
                 }
@@ -216,7 +240,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         index?.let {
             _scheduledAppointments.value!!.toMutableList()[it] =
                 _currentScheduledAppointment.value!!
-            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+            }
         }
     }
 

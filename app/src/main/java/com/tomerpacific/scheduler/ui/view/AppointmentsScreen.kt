@@ -33,20 +33,22 @@ fun AppointmentsScreen(viewModel: MainViewModel,
         }
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_black),
-                    contentDescription = "Logo",
-                    contentScale = ContentScale.Inside,
-                    modifier = Modifier.matchParentSize()
-                )
+            Image(
+                painter = painterResource(id = R.drawable.logo_black),
+                contentDescription = "Logo",
+                contentScale = ContentScale.Inside,
+                modifier = Modifier.matchParentSize()
+            )
             Column(modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center) {
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End) {
-                    LogoutButton(shouldBeDisplayed = user.value != null, onClickHandler = {
-                        viewModel.logout()
-                        onUserLogout()
-                    })
+                    LogoutButton(
+                        shouldBeDisplayed = user.value != null,
+                        onClickHandler = {
+                            viewModel.logout()
+                            onUserLogout()
+                        })
                 }
                 AppointmentsList(viewModel, onAppointmentCancelled, onAppointmentClicked)
                 Row(modifier = Modifier.fillMaxSize(),
