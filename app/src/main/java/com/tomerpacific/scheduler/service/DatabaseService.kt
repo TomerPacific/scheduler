@@ -70,9 +70,9 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
-    fun cancelAppointment(appointment: AppointmentModel,
+    suspend fun cancelAppointment(appointment: AppointmentModel,
                           onAppointmentCancelled: (String?, String?) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val dataSnapshot =  database.child(DATES_KEY)
                 .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).get().await()
                 val scheduledAppointments = dataSnapshot.getValue<HashMap<String, String>>()
@@ -83,7 +83,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
                     .child(Utils.convertTimestampToDayAndMonth(appointment.appointmentDate)).setValue(scheduledAppointments)
             }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val userScheduledAppointmentsSnapshot = database.child(APPOINTMENTS_KEY)
                 .child(appointment.userId!!)
                 .get()

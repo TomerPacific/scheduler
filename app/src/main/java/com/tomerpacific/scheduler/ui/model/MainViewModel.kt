@@ -128,7 +128,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addAppointment(appointment: AppointmentModel, onAppointmentScheduled: (String?, String?) -> Unit) {
         appointment.userId = _user.value!!.uid
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             databaseService.setAppointment(appointment, onAppointmentScheduled)
         }
     }
@@ -152,7 +152,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
                                           onAppointmentCancelled: (String?, String?) -> Unit) {
-        databaseService.cancelAppointment(appointment, onAppointmentCancelled)
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.cancelAppointment(appointment, onAppointmentCancelled)
+        }
     }
 
     fun getAppointmentsForDay(date: LocalDateTime) {
