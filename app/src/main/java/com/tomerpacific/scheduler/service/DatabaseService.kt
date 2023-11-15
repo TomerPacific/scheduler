@@ -104,11 +104,11 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
     }
 
-    fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
+    suspend fun getAvailableAppointmentsForDate(viewModel: MainViewModel, date: LocalDateTime) {
         val timestamp = date.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli()
         val scheduledAppointments = mutableListOf<Long>()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val result =  database.child(DATES_KEY)
                 .child(Utils.convertTimestampToDayAndMonth(timestamp)).get().await()
             if (result.exists()) {
@@ -125,8 +125,8 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         }
     }
 
-    private fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
-        CoroutineScope(Dispatchers.IO).launch {
+    private suspend fun removePastAppointmentsForUser(user: FirebaseUser, pastAppointments: MutableList<AppointmentModel>) {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(DATES_KEY)
             .endAt(Date().time.toString())
             .get().await()
@@ -139,7 +139,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(APPOINTMENTS_KEY).child(user.uid).get().await()
             val scheduledAppointments =
                 dataSnapshot.getValue<HashMap<String, AppointmentModel>>()
@@ -156,8 +156,8 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         }
     }
 
-    fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun updateAppointmentForUser(user: FirebaseUser, appointment:AppointmentModel) {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(APPOINTMENTS_KEY).child(user.uid).get().await()
             val scheduledAppointments =
                 dataSnapshot.getValue<HashMap<String, AppointmentModel>>()
@@ -208,9 +208,9 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         return appointments
     }
 
-    fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel, isAdmin: Boolean) {
+    suspend fun fetchScheduledAppointmentsForUser(user: FirebaseUser, viewModel: MainViewModel, isAdmin: Boolean) {
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val dataSnapshot = database.child(APPOINTMENTS_KEY).get().await()
             val scheduledAppointments = dataSnapshot.getValue<HashMap<String, HashMap<String, AppointmentModel>>>()
             if (scheduledAppointments != null) {
@@ -242,7 +242,7 @@ class DatabaseService(_remoteConfigService: RemoteConfigService) {
         viewModel.setScheduledAppointments(scheduledAppointments = appointments)
     }
 
-    private fun collectScheduledAppointmentsForRegularUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
+    private suspend fun collectScheduledAppointmentsForRegularUser(scheduledAppointments: HashMap<String, HashMap<String, AppointmentModel>>,
                                                            user: FirebaseUser,
                                                            viewModel: MainViewModel) {
         val pastAppointments = mutableListOf<AppointmentModel>()

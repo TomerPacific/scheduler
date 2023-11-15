@@ -147,7 +147,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateScheduledAppointmentsForUser() {
-        databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+        }
     }
 
     fun cancelScheduledAppointmentForUser(appointment: AppointmentModel,
@@ -162,20 +164,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             setAvailableAppointments(listOf())
             return
         }
-        databaseService.getAvailableAppointmentsForDate(this, date)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseService.getAvailableAppointmentsForDate(this@MainViewModel, date)
+        }
     }
 
     private fun remoteConfigurationActivatedSuccess() {
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+            }
         }
     }
 
     private fun remoteConfigurationActivatedFailure(errorMsg: String) {
         _user.value = authService.getCurrentlySignedInUser()
         if (_user.value != null) {
-            databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this, isAdminUser())
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.fetchScheduledAppointmentsForUser(_user.value!!, this@MainViewModel, isAdminUser())
+            }
+
         }
     }
 
@@ -211,7 +221,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         index?.let {
                             _scheduledAppointments.value!!.toMutableList()[it] =
                                 _currentScheduledAppointment.value!!
-                            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                            viewModelScope.launch(Dispatchers.IO) {
+                                databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+                            }
                         }
                     }
                 }
@@ -228,7 +240,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         index?.let {
             _scheduledAppointments.value!!.toMutableList()[it] =
                 _currentScheduledAppointment.value!!
-            databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+            viewModelScope.launch(Dispatchers.IO) {
+                databaseService.updateAppointmentForUser(_user.value!!,_currentScheduledAppointment.value!!)
+            }
         }
     }
 
